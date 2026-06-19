@@ -92,6 +92,7 @@ export default function App() {
   const [enigmaInput, setEnigmaInput] = useState('');
   const [enigmaStatus, setEnigmaStatus] = useState<GameStatus>('playing');
   const [enigmaMessage, setEnigmaMessage] = useState<string | null>(null);
+  const [enigmaTimeLeft, setEnigmaTimeLeft] = useState(180);
 
   const startEnigmaGame = () => {
     const wordObj = getRandomLargeWord(settings.language);
@@ -102,6 +103,7 @@ export default function App() {
     setEnigmaInput('');
     setEnigmaStatus('playing');
     setEnigmaMessage(null);
+    setEnigmaTimeLeft(180);
     setGameMode('enigma');
     triggerSound('click');
     pushLog('system', isPt ? 'Nova palavra Enigma selecionada para desencriptação.' : 'New Enigma secret word selected for signal decrypting.');
@@ -149,6 +151,46 @@ export default function App() {
       );
     }
   }, [enigmaScore, enigmaStatus, gameMode, enigmaWord, isPt, triggerSound, pushLog]);
+
+  // Enigma Countdown Timer and Progressive Score Loss
+  useEffect(() => {
+    if (gameMode !== 'enigma' || enigmaStatus !== 'playing') {
+      return;
+    }
+
+    const intervalId = setInterval(() => {
+      setEnigmaTimeLeft((prevTime) => {
+        if (prevTime <= 1) {
+          clearInterval(intervalId);
+          setEnigmaStatus('lost');
+          triggerSound('lose');
+          pushLog('warning', isPt 
+            ? `Insucesso! O tempo limite de 3 minutos expirou para a decodificação Enigma. A palavra era: ${enigmaWord?.word}` 
+            : `Decryption timeout! The 3-minute limit expired. The secret word was: ${enigmaWord?.word}`
+          );
+          return 0;
+        }
+
+        const updatedTime = prevTime - 1;
+        const elapsedSeconds = 180 - updatedTime;
+
+        // Progressive score loss: deduct 1 point every 3 seconds, excluding the first 5 seconds
+        if (elapsedSeconds > 5 && updatedTime % 3 === 0) {
+          setEnigmaScore((prevScore) => {
+            const nextScore = Math.max(1, prevScore - 1);
+            if (nextScore === 1 && prevScore > 1) {
+              pushLog('token', isPt ? 'Alerta: Escore Enigma no nível crítico de 1 ponto!' : 'Alert: Enigma score reached critical level of 1 point!');
+            }
+            return nextScore;
+          });
+        }
+
+        return updatedTime;
+      });
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [gameMode, enigmaStatus, enigmaWord, isPt, triggerSound, pushLog]);
 
   // Modal Triggers
   const [isStatsOpen, setIsStatsOpen] = useState(false);
@@ -832,7 +874,20 @@ export default function App() {
               </div>
 
               {/* Score HUD telemetry */}
-              <div className="mt-3 sm:mt-4 flex flex-col items-center w-full max-w-xs">
+              <div className="mt-3 sm:mt-4 flex flex-col items-center w-full max-w-xs gap-1">
+                <div className="flex justify-between w-full text-[10px] uppercase font-bold tracking-wider px-1">
+                  <span className="text-slate-400 font-mono">{isPt ? 'Tempo Restante:' : 'Time Remaining:'}</span>
+                  <span className={`font-mono font-black transition-colors duration-300 ${
+                    enigmaTimeLeft < 30 
+                      ? 'text-rose-500 animate-pulse text-xs sm:text-sm font-extrabold' 
+                      : enigmaTimeLeft < 60 
+                        ? 'text-amber-500 animate-pulse' 
+                        : 'text-emerald-400'
+                  }`}>
+                    {Math.floor(enigmaTimeLeft / 60)}:{(enigmaTimeLeft % 60).toString().padStart(2, '0')}
+                  </span>
+                </div>
+
                 <div className="flex justify-between w-full text-[10px] uppercase font-bold tracking-wider mb-1 px-1">
                   <span className="text-slate-400 font-mono">{isPt ? 'Escore Final Estimado:' : 'Estimated Final Score:'}</span>
                   <span className={enigmaScore > 40 ? 'text-emerald-400 font-black animate-pulse font-mono' : 'text-rose-500 font-black animate-bounce font-mono'}>
