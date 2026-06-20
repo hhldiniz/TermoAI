@@ -833,10 +833,253 @@ export const ENGLISH_WORDS: WordData[] = [
   }
 ];
 
-export function getWordsByLanguage(lang: 'pt' | 'en'): WordData[] {
-  return lang === 'pt' 
-    ? [...PORTUGUESE_WORDS, ...EXTRA_PORTUGUESE_WORDS] 
-    : [...ENGLISH_WORDS, ...EXTRA_ENGLISH_WORDS];
+export const SPANISH_WORDS: WordData[] = [
+  // --- FÁCIL: PALABRAS DE 4 LETRAS ---
+  {
+    word: 'PISO',
+    category: 'Lugares',
+    clue: 'Vivienda o apartamento donde reside una persona.',
+    difficulty: 'fácil',
+    explanation: 'Término muy utilizado en España para referirse a un apartamento.'
+  },
+  {
+    word: 'TAPA',
+    category: 'Alimentos',
+    clue: 'Pequeña porción de comida que se sirve en los bares acompañando a la bebida.',
+    difficulty: 'fácil',
+    explanation: 'Tradición gastronómica imprescindible de la cultura de bar española.'
+  },
+  {
+    word: 'GATO',
+    category: 'Animales',
+    clue: 'Pequeño mamífero felino doméstico de cuatro patas.',
+    difficulty: 'fácil',
+    explanation: 'Mascota común, también apodo tradicional para los madrileños.'
+  },
+  {
+    word: 'COPA',
+    category: 'Objetos',
+    clue: 'Vaso con pie para beber vino, champán o licores.',
+    difficulty: 'fácil',
+    explanation: 'Recipiente de cristal idóneo para celebraciones festivas o cenas.'
+  },
+  {
+    word: 'CINE',
+    category: 'Lugares',
+    clue: 'Sala de proyección de obras cinematográficas para público general.',
+    difficulty: 'fácil',
+    explanation: 'Espacio cultural donde se proyectan películas sobre una gran pantalla.'
+  },
+  {
+    word: 'CENA',
+    category: 'Alimentos',
+    clue: 'Última comida del día que se hace al atardecer o por la noche.',
+    difficulty: 'fácil',
+    explanation: 'Comida tardía, de carácter muy socializador bajo las costumbres españolas.'
+  },
+  
+  // --- MÉDIO: PALABRAS DE 5 LETRAS ---
+  {
+    word: 'COCHE',
+    category: 'Tecnología',
+    clue: 'Automóvil de cuatro ruedas utilizado para trasladar personas.',
+    difficulty: 'médio',
+    explanation: 'Voz preferida en España sobre carro/auto para referirse al automóvil común.'
+  },
+  {
+    word: 'MOVIL',
+    category: 'Tecnología',
+    clue: 'Teléfono portátil que permite comunicarse desde cualquier lugar.',
+    difficulty: 'médio',
+    explanation: 'Denominación común y estándar en España para el terminal telefónico celular.'
+  },
+  {
+    word: 'PLAYA',
+    category: 'Lugares',
+    clue: 'Ribera de agua marina formada de arena, grava o piedras en la costa.',
+    difficulty: 'médio',
+    explanation: 'Atractivo vacacional supremo de las extensas costas de la Península.'
+  },
+  {
+    word: 'QUESO',
+    category: 'Alimentos',
+    clue: 'Alimento sólido obtenido por maduración de la cuajada de la leche.',
+    difficulty: 'médio',
+    explanation: 'Lácteo tradicional español de gran calidad, como el queso manchego.'
+  },
+  {
+    word: 'PLAZA',
+    category: 'Lugares',
+    clue: 'Lugar ancho y espacioso dentro de una población donde se juntan calles.',
+    difficulty: 'médio',
+    explanation: 'Centro social urbano neurálgico en España, común en todas las villas.'
+  },
+  {
+    word: 'OLIVA',
+    category: 'Alimentos',
+    clue: 'Fruto del olivo del cual se extrae aceite o se consume sazonado.',
+    difficulty: 'médio',
+    explanation: 'Símbolo del cultivo mediterráneo e ingrediente fundamental en el país.'
+  },
+  {
+    word: 'JAMON',
+    category: 'Alimentos',
+    clue: 'Pata trasera de cerdo curada en maduración lenta de salazón.',
+    difficulty: 'médio',
+    explanation: 'Producto estrella de la charcutería y gastronomía clásica española.'
+  },
+  {
+    word: 'LIBRO',
+    category: 'Objetos',
+    clue: 'Conjunto de hojas de papel encuadernadas que forman un volumen literario.',
+    difficulty: 'médio',
+    explanation: 'Clásico objeto de lectura y transmisión del ingenio intelectual.'
+  },
+
+  // --- DIFÍCIL: PALABRAS DE 6 LETRAS ---
+  {
+    word: 'PATATA',
+    category: 'Alimentos',
+    clue: 'Tubérculo comestible muy común cocido o frito en sartén.',
+    difficulty: 'difícil',
+    explanation: 'Terminología preferida en la España peninsular para este alimento esencial.'
+  },
+  {
+    word: 'CAMINO',
+    category: 'Lugares',
+    clue: 'Vías terrestres por donde se transita habitualmente de una zona a otra.',
+    difficulty: 'difícil',
+    explanation: 'Fuerte referencia al Camino de Santiago, ruta milenaria europea.'
+  },
+  {
+    word: 'BODEGA',
+    category: 'Lugares',
+    clue: 'Espacio bajo tierra o almacén donde se cría y conserva el vino.',
+    difficulty: 'difícil',
+    explanation: 'Establecimiento vinícola de gran raigambre histórica en los campos españoles.'
+  },
+  {
+    word: 'PAELLA',
+    category: 'Alimentos',
+    clue: 'Arroz cocinado con azafrán, verduras y carnes en sartén plana ancha.',
+    difficulty: 'difícil',
+    explanation: 'Esplendor culinario valenciano consolidado como el más internacional del país.'
+  },
+  {
+    word: 'CONEJO',
+    category: 'Animales',
+    clue: 'Mamífero de orejas largas y cola corta que destaca por su rapidez y saltos.',
+    difficulty: 'difícil',
+    explanation: 'Fauna tan común en la antigüedad que inspiró el nombre antiguo de Hispania.'
+  },
+  {
+    word: 'BOSQUE',
+    category: 'Naturaleza',
+    clue: 'Ecosistema poblado de árboles, matorrales y arbustos.',
+    difficulty: 'difícil',
+    explanation: 'Extensión forestal silvestre fundamental para la purificación de la biosfera.'
+  },
+  {
+    word: 'PAGINA',
+    category: 'Objetos',
+    clue: 'Cada una de las dos caras de una hoja de papel encuadernada.',
+    difficulty: 'difícil',
+    explanation: 'Sección contable o literaria de manuscritos o cuadernos impresos.'
+  }
+];
+
+export const EXTRA_SPANISH_WORDS: WordData[] = [
+  {
+    word: 'CAFE',
+    category: 'Alimentos',
+    clue: 'Bebida aromática estimulante elaborada con granos de cafeto tostados.',
+    difficulty: 'fácil',
+    explanation: 'Infusión cotidiana socializada habitualmente en todo tipo de cafeterías.'
+  },
+  {
+    word: 'MESA',
+    category: 'Objetos',
+    clue: 'Mueble con tablero plano para sostener cosas elevado sobre columnas.',
+    difficulty: 'fácil',
+    explanation: 'Mobiliario básico presente en todos los hogares y terrazas españolas.'
+  },
+  {
+    word: 'VIDA',
+    category: 'Naturaleza',
+    clue: 'Fuerza biológica interna mediante la que obra el ser que la posee.',
+    difficulty: 'fácil',
+    explanation: 'Línea de existencia orgánica indispensable para la conciencia natural.'
+  },
+  {
+    word: 'SILLA',
+    category: 'Objetos',
+    clue: 'Asiento individual con respaldo alto que se eleva sobre cuatro patas.',
+    difficulty: 'médio',
+    explanation: 'Asiento básico ergonómico doméstico y comercial habitual.'
+  },
+  {
+    word: 'LLAVE',
+    category: 'Objetos',
+    clue: 'Pequeño utensilio de metal dentado destinado a accionar una cerradura.',
+    difficulty: 'médio',
+    explanation: 'Herramienta de control de acceso físico a un habitáculo o coche.'
+  },
+  {
+    word: 'PERRO',
+    category: 'Animales',
+    clue: 'Mamífero cánido domesticado célebre por su fidelidad e instinto leal.',
+    difficulty: 'médio',
+    explanation: 'Guardián y mejor amigo vertebrado de las comunidades familiares.'
+  },
+  {
+    word: 'TOMATE',
+    category: 'Alimentos',
+    clue: 'Fruto carnoso rojo de la tomatera clave en ensaladas, sopas y salsas.',
+    difficulty: 'difícil',
+    explanation: 'Ingrediente pilar del gazpacho andaluz y del pan de cristal frotado.'
+  },
+  {
+    word: 'SIERRA',
+    category: 'Naturaleza',
+    clue: 'Subconjunto montañoso alineado que posee un perfil de crestas dentadas.',
+    difficulty: 'difícil',
+    explanation: 'Sistemas orográficos y accidentes de montaña comunes en toda España.'
+  },
+  {
+    word: 'CIUDAD',
+    category: 'Lugares',
+    clue: 'Asentamiento urbano populoso gobernado por un ayuntamiento o cabildo.',
+    difficulty: 'difícil',
+    explanation: 'Centro de aglutinación poblacional, servicios y vida cultural.'
+  }
+];
+
+export const LARGE_WORDS_ES: LargeWordData[] = [
+  { word: 'BARCELONA', category: 'Lugares', clue: 'Metrópolis mediterránea insigne por la basílica de la Sagrada Familia y el Modernismo.' },
+  { word: 'ORDENADOR', category: 'Tecnología', clue: 'Dispositivo electrónico capaz de cómputos de altísima velocidad y procesamiento.' },
+  { word: 'FLAMENCO', category: 'Mente', clue: 'Expresión artística andaluza que aúna danza apasionada, cante hondo y guitarra.' },
+  { word: 'ACUEDUCTO', category: 'Tecnología', clue: 'Canal pétreo ideado por los romanos para salvar desniveles y llevar agua a la urbe.' },
+  { word: 'UNIVERSIDAD', category: 'Lugares', clue: 'Institución de formación académica superior encargada de otorgar grados.' },
+  { word: 'MONTANAS', category: 'Naturaleza', clue: 'Estructuras naturales rocosas sumamente altas elevadas sobre llanuras terrestres.' },
+  { word: 'ANDALUCIA', category: 'Lugares', clue: 'Comunidad autónoma del sur colmada de campos de olivos, sol y mezquitas.' }
+];
+
+export const EXTRA_LARGE_WORDS_ES: LargeWordData[] = [
+  { word: 'TELEVISION', category: 'Tecnología', clue: 'Aparato receptor electrónico para visionar películas e imágenes sintonizadas.' },
+  { word: 'BIBLIOTECA', category: 'Lugares', clue: 'Establecimiento que guarda ordenadamente tomos escritos para la consulta.' },
+  { word: 'DONQUIJOTE', category: 'Objetos', clue: 'Personaje novelesco inmortal de La Mancha obsesionado con gigantes y molinos.' },
+  { word: 'CHOCOLATE', category: 'Alimentos', clue: 'Dulce preparado con cacao triturado mezclado refinadamente con manteca.' },
+  { word: 'MARIPOSA', category: 'Animales', clue: 'Insecto de alas coloridas vistosas desarrolladas por metamorfosis completa.' }
+];
+
+export function getWordsByLanguage(lang: 'pt' | 'en' | 'es'): WordData[] {
+  if (lang === 'pt') {
+    return [...PORTUGUESE_WORDS, ...EXTRA_PORTUGUESE_WORDS];
+  } else if (lang === 'es') {
+    return [...SPANISH_WORDS, ...EXTRA_SPANISH_WORDS];
+  } else {
+    return [...ENGLISH_WORDS, ...EXTRA_ENGLISH_WORDS];
+  }
 }
 
 /**
@@ -847,7 +1090,7 @@ export function getWordsByLanguage(lang: 'pt' | 'en'): WordData[] {
  * - Hard: 6 letters, rare characters, complex patterns
  */
 export function generateWordOffline(
-  lang: 'pt' | 'en',
+  lang: 'pt' | 'en' | 'es',
   category: string,
   temp: number,
   difficulty: 'easy' | 'medium' | 'hard' = 'medium'
@@ -894,7 +1137,11 @@ export function generateWordOffline(
              (cleanCat === 'locais' && w.category.toLowerCase() === 'places') ||
              (cleanCat === 'places' && w.category.toLowerCase() === 'locais') ||
              (cleanCat === 'tecnologia' && w.category.toLowerCase() === 'tech') ||
-             (cleanCat === 'tech' && w.category.toLowerCase() === 'tecnologia')
+             (cleanCat === 'tech' && w.category.toLowerCase() === 'tecnologia') ||
+             (cleanCat === 'naturaleza' && w.category.toLowerCase() === 'nature') ||
+             (cleanCat === 'animales' && w.category.toLowerCase() === 'animals') ||
+             (cleanCat === 'alimentos' && w.category.toLowerCase() === 'foods') ||
+             (cleanCat === 'lugares' && w.category.toLowerCase() === 'places')
     );
   }
 
@@ -976,7 +1223,7 @@ export const VALID_GUESS_VOCABULARY_EN = [
   'BONES', 'SKINS', 'FLESH', 'GRASS', 'TREES', 'FRUIT', 'GRAIN', 'SEEDS'
 ];
 
-export function isValidGuess(guess: string, lang: 'pt' | 'en', expectedLength: number = 5): boolean {
+export function isValidGuess(guess: string, lang: 'pt' | 'en' | 'es', expectedLength: number = 5): boolean {
   const normGuess = normalizeText(guess);
   if (normGuess.length !== expectedLength) return false;
   return /^[A-Z]+$/.test(normGuess);
@@ -1024,7 +1271,7 @@ export const LARGE_WORDS_EN: LargeWordData[] = [
   { word: 'MACHINE', category: 'Tech', clue: 'An apparatus using mechanical power and having several parts.' }
 ];
 
-export function getRandomLargeWord(lang: 'pt' | 'en'): LargeWordData {
+export function getRandomLargeWord(lang: 'pt' | 'en' | 'es'): LargeWordData {
   let usedWordsHistory: string[] = [];
   if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
     try {
@@ -1044,7 +1291,9 @@ export function getRandomLargeWord(lang: 'pt' | 'en'): LargeWordData {
 
   const list = lang === 'pt' 
     ? [...LARGE_WORDS_PT, ...EXTRA_LARGE_WORDS_PT] 
-    : [...LARGE_WORDS_EN, ...EXTRA_LARGE_WORDS_EN];
+    : lang === 'es'
+      ? [...LARGE_WORDS_ES, ...EXTRA_LARGE_WORDS_ES]
+      : [...LARGE_WORDS_EN, ...EXTRA_LARGE_WORDS_EN];
   let available = list.filter(w => !usedWordsHistory.includes(w.word.toUpperCase()));
   if (available.length === 0) {
     available = list; // fallback if all used

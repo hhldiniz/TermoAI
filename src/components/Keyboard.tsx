@@ -5,7 +5,7 @@ import { LetterStatus } from '../types';
 interface KeyboardProps {
   onKeyPress: (key: string) => void;
   letterStatuses: Record<string, LetterStatus>;
-  language: 'pt' | 'en';
+  language: 'pt' | 'en' | 'es';
   triggerSound: (type: 'click' | 'flip' | 'win' | 'lose' | 'error') => void;
 }
 
@@ -16,10 +16,15 @@ export default function Keyboard({
   triggerSound
 }: KeyboardProps) {
   const isPt = language === 'pt';
+  const isEs = language === 'es';
   
   const rows = [
     ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
-    ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ç'],
+    isPt 
+      ? ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ç']
+      : isEs
+        ? ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ñ']
+        : ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
     ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'BACKSPACE']
   ];
 

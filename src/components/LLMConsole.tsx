@@ -3,7 +3,7 @@ import { Terminal, Settings, RefreshCw, Cpu, Flame, Database, ChevronDown, Chevr
 import { LLMConfig, LLMLog, WordData } from '../types';
 
 interface LLMConsoleProps {
-  language: 'pt' | 'en';
+  language: 'pt' | 'en' | 'es';
   config: LLMConfig;
   setConfig: React.Dispatch<React.SetStateAction<LLMConfig>>;
   logs: LLMLog[];
@@ -47,12 +47,13 @@ export default function LLMConsole({
 
   // Translate labels based on game language selector
   const isPt = language === 'pt';
-  const labelCategory = isPt ? 'Categoria do Modelo' : 'Model Category';
-  const labelTemp = isPt ? 'Temperatura (Criatividade)' : 'Temperature (Creativity)';
-  const labelTopP = isPt ? 'Amostragem Top-P' : 'Top-P Sampling';
-  const labelModel = isPt ? 'Modelo Ativo' : 'Active Model';
-  const labelInference = isPt ? 'Estado do Mecanismo' : 'Engine State';
-  const labelGenerate = isPt ? 'Gerar Nova Palavra' : 'Generate New Puzzle';
+  const isEs = language === 'es';
+  const labelCategory = isPt ? 'Categoria do Modelo' : isEs ? 'Categoría de Modelo' : 'Model Category';
+  const labelTemp = isPt ? 'Temperatura (Criatividade)' : isEs ? 'Temperatura (Creatividad)' : 'Temperature (Creativity)';
+  const labelTopP = isPt ? 'Amostragem Top-P' : isEs ? 'Muestreo Top-P' : 'Top-P Sampling';
+  const labelModel = isPt ? 'Modelo Ativo' : isEs ? 'Modelo Activo' : 'Active Model';
+  const labelInference = isPt ? 'Estado do Mecanismo' : isEs ? 'Estado del Motor' : 'Engine State';
+  const labelGenerate = isPt ? 'Gerar Nova Palavra' : isEs ? 'Generar Nueva Palabra' : 'Generate New Puzzle';
   
   const categoriesPt = [
     { value: 'all', label: 'Qualquer (Aleatório)' },
@@ -62,6 +63,16 @@ export default function LLMConsole({
     { value: 'Objetos', label: 'Objetos do Cotidiano' },
     { value: 'Tecnologia', label: 'Tecnologia e Engenharia' },
     { value: 'Locais', label: 'Lugares e Ambientes' }
+  ];
+
+  const categoriesEs = [
+    { value: 'all', label: 'Cualquiera (Aleatorio)' },
+    { value: 'Naturaleza', label: 'Naturaleza y Clima' },
+    { value: 'Animales', label: 'Animales y Biología' },
+    { value: 'Alimentos', label: 'Alimentos y Platos' },
+    { value: 'Objetos', label: 'Objetos Cotidianos' },
+    { value: 'Tecnología', label: 'Tecnología e Ingeniería' },
+    { value: 'Lugares', label: 'Lugares y Entornos' }
   ];
 
   const categoriesEn = [
@@ -74,21 +85,21 @@ export default function LLMConsole({
     { value: 'Places', label: 'Places & Venues' }
   ];
 
-  const targetCategories = isPt ? categoriesPt : categoriesEn;
+  const targetCategories = isPt ? categoriesPt : isEs ? categoriesEs : categoriesEn;
 
   const handleCategoryChange = (val: string) => {
     triggerSound('click');
     setConfig(prev => ({ ...prev, category: val }));
-    addLog('info', isPt ? `Filtro de contexto definido para: ${val}` : `Context attention filter set to: ${val}`);
+    addLog('info', isPt ? `Filtro de contexto definido para: ${val}` : isEs ? `Filtro de contexto de IA definido en: ${val}` : `Context attention filter set to: ${val}`);
   };
 
   const handleTemperatureChange = (val: number) => {
     triggerSound('click');
     setConfig(prev => ({ ...prev, temperature: val }));
-    const style = val < 0.35 ? (isPt ? 'Convergente/Fácil' : 'Conservative/Easy') :
-                  val < 0.7 ? (isPt ? 'Balanceado/Normal' : 'Balanced/Medium') : 
-                              (isPt ? 'Divergente/Exótico' : 'Creative/Unorthodox');
-    addLog('info', isPt ? `Hiperparametro Temperatura ajustado para: ${val} (${style})` : `Temperature hyperparameter updated to: ${val} (${style})`);
+    const style = val < 0.35 ? (isPt ? 'Convergente/Fácil' : isEs ? 'Conservador/Fácil' : 'Conservative/Easy') :
+                  val < 0.7 ? (isPt ? 'Balanceado/Normal' : isEs ? 'Balanceado/Medio' : 'Balanced/Medium') : 
+                               (isPt ? 'Divergente/Exótico' : isEs ? 'Creativo/Exótico' : 'Creative/Unorthodox');
+    addLog('info', isPt ? `Hiperparametro Temperatura ajustado para: ${val} (${style})` : isEs ? `Hiperparámetro de Temperatura ajustado en: ${val} (${style})` : `Temperature hyperparameter updated to: ${val} (${style})`);
   };
 
   const addLog = (type: 'system' | 'info' | 'success' | 'warning' | 'token', message: string) => {
@@ -99,9 +110,9 @@ export default function LLMConsole({
   // Re-run offline initialization diagnostics
   const runDiagnostics = () => {
     triggerSound('click');
-    addLog('system', isPt ? 'Solicitando diagnóstico do micro-modelo local...' : 'Requesting local micro-model diagnostics...');
-    setTimeout(() => addLog('info', isPt ? 'VRAM: Alocando cache WebGL compatível nas texturas 2D.' : 'VRAM: Binding WebGL-2D cache layers.'), 200);
-    setTimeout(() => addLog('info', isPt ? 'Tokens carregados: Letras A-Z normalizadas em codificação UTF-8.' : 'Tokens uploaded: Standard A-Z mappings loaded (UTF-8 format).'), 450);
+    addLog('system', isPt ? 'Solicitando diagnóstico do micro-modelo local...' : isEs ? 'Solicitando diagnóstico de micro-modelo local...' : 'Requesting local micro-model diagnostics...');
+    setTimeout(() => addLog('info', isPt ? 'VRAM: Alocando cache WebGL compatível nas texturas 2D.' : isEs ? 'VRAM: Asignando capas de caché WebGL-2D.' : 'VRAM: Binding WebGL-2D cache layers.'), 200);
+    setTimeout(() => addLog('info', isPt ? 'Tokens carregados: Letras A-Z normalizadas em codificação UTF-8.' : isEs ? 'Tokens cargados: Letras A-Z normalizadas (formato UTF-8).' : 'Tokens uploaded: Standard A-Z mappings loaded (UTF-8 format).'), 450);
     setTimeout(() => {
       // Generate some nice numbers
       const speed = +(35 + Math.random() * 20).toFixed(1);
@@ -112,7 +123,7 @@ export default function LLMConsole({
         time: timeMs,
         tokens: 5
       }));
-      addLog('success', isPt ? `Status: OK. Desempenho estimado: ${speed} t/s. Latência: ${timeMs}ms.` : `Status: ONLINE. Speed: ${speed} t/s. Latency: ${timeMs}ms.`);
+      addLog('success', isPt ? `Status: OK. Desempenho estimado: ${speed} t/s. Latência: ${timeMs}ms.` : isEs ? `Estado: ACTIVADO. Velocidad: ${speed} t/s. Latencia: ${timeMs}ms.` : `Status: ONLINE. Speed: ${speed} t/s. Latency: ${timeMs}ms.`);
     }, 700);
   };
 
@@ -135,13 +146,13 @@ export default function LLMConsole({
             <Cpu className={`w-4.5 h-4.5 ${isGenerating ? 'text-emerald-500 animate-spin' : 'text-emerald-500'}`} />
             <div className="flex flex-col text-left">
               <span className="text-xs font-black text-white uppercase tracking-wider flex items-center gap-1">
-                {isPt ? 'LLM CONSOLE LOCAL' : 'LOCAL LLM CONSOLE'}
+                {isPt ? 'LLM CONSOLE LOCAL' : isEs ? 'CONSOLA LOCAL DE LLM' : 'LOCAL LLM CONSOLE'}
                 <span className="text-[9px] bg-[#121213] border border-[#3a3a3c] text-[#818384] px-1 py-0.5 rounded lowercase font-mono">v0.1.2</span>
               </span>
               <span className="text-[10px] text-[#818384] font-mono tracking-tight font-bold">
                 {isGenerating 
-                  ? (isPt ? 'Decodificando tokens...' : 'Decoding tokens...') 
-                  : (isPt ? `TermoLLM-0.12B offline [Pronto]` : `TermoLLM-0.12B offline [Ready]`)}
+                  ? (isPt ? 'Decodificando tokens...' : isEs ? 'Decodificando tokens...' : 'Decoding tokens...') 
+                  : (isPt ? `TermoLLM-0.12B offline [Pronto]` : isEs ? `TermoLLM-0.12B offline [Listo]` : `TermoLLM-0.12B offline [Ready]`)}
               </span>
             </div>
           </div>
@@ -167,14 +178,14 @@ export default function LLMConsole({
                 className={`py-2 px-1 font-black uppercase tracking-wider flex items-center gap-1.5 border-b-2 transition-all ${activeTab === 'terminal' ? 'text-emerald-500 border-emerald-500' : 'text-[#818384] border-transparent hover:text-white'}`}
               >
                 <Terminal className="w-3.5 h-3.5" />
-                {isPt ? 'Terminal' : 'Inference Logs'}
+                {isPt ? 'Terminal' : isEs ? 'Registros' : 'Inference Logs'}
               </button>
               <button 
                 onClick={() => { triggerSound('click'); setActiveTab('hyperparameters'); }}
                 className={`py-2 px-1 font-black uppercase tracking-wider flex items-center gap-1.5 border-b-2 transition-all ${activeTab === 'hyperparameters' ? 'text-emerald-500 border-emerald-500' : 'text-[#818384] border-transparent hover:text-white'}`}
               >
                 <Settings className="w-3.5 h-3.5" />
-                {isPt ? 'Hiperparâmetros' : 'AI Parameters'}
+                {isPt ? 'Hiperparâmetros' : isEs ? 'Parámetros de IA' : 'AI Parameters'}
               </button>
             </div>
 
@@ -220,7 +231,7 @@ export default function LLMConsole({
                         className="text-[9px] text-[#818384] hover:text-white flex items-center gap-1 border border-[#3a3a3c] bg-[#1a1a1b] hover:bg-[#3a3a3c] px-2 py-0.5 rounded transition-all active:scale-95 duration-100"
                       >
                         <RefreshCw className="w-2.5 h-2.5" />
-                        {isPt ? 'Diagnóstico' : 'Diagnostic Audit'}
+                        {isPt ? 'Diagnóstico' : isEs ? 'Diagnóstico' : 'Diagnostic Audit'}
                       </button>
                     </div>
                   </div>
@@ -241,7 +252,7 @@ export default function LLMConsole({
                     </div>
                     <span className="text-[9px] bg-[#1a1a1b] border border-[#3a3a3c] text-emerald-500 px-2 py-0.5 rounded font-black tracking-wider uppercase flex items-center gap-1.5 shadow-[0_0_8px_rgba(16,185,129,0.15)]">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_4px_#10b981]" />
-                      100% {isPt ? 'Offline' : 'Offline'}
+                      100% {isPt ? 'Offline' : isEs ? 'Sin Conexión' : 'Offline'}
                     </span>
                   </div>
 
@@ -265,7 +276,7 @@ export default function LLMConsole({
                   {/* Difficulty Selection Dropdown */}
                   <div id="hyperparam-difficulty-group" className="flex flex-col gap-1">
                     <label className="text-[10px] text-[#818384] uppercase font-bold tracking-widest">
-                      {isPt ? 'Dificuldade da Geração' : 'Generation Difficulty'}
+                      {isPt ? 'Dificuldade da Geração' : isEs ? 'Dificultad de la Palabra' : 'Generation Difficulty'}
                     </label>
                     <div className="relative">
                       <select 
@@ -274,18 +285,18 @@ export default function LLMConsole({
                           const val = e.target.value as 'easy' | 'medium' | 'hard';
                           triggerSound('click');
                           setConfig(prev => ({ ...prev, difficulty: val }));
-                          addLog('info', isPt ? `Dificuldade reconfigurada para: ${val.toUpperCase()}` : `Generation difficulty reconfigured to: ${val.toUpperCase()}`);
+                          addLog('info', isPt ? `Dificuldade reconfigurada para: ${val.toUpperCase()}` : isEs ? `Dificultad reconfigurada a: ${val.toUpperCase()}` : `Generation difficulty reconfigured to: ${val.toUpperCase()}`);
                         }}
                         className="w-full bg-[#121213] border border-[#3a3a3c] rounded px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-550 appearance-none font-bold font-sans uppercase tracking-wide"
                       >
                         <option value="easy" className="bg-[#121213] text-white font-bold">
-                          {isPt ? 'FÁCIL (4 LETRAS / COMUNS)' : 'EASY (4 LETTERS / COMMON)'}
+                          {isPt ? 'FÁCIL (4 LETRAS / COMUNS)' : isEs ? 'FÁCIL (4 LETRAS / COMUNES)' : 'EASY (4 LETTERS / COMMON)'}
                         </option>
                         <option value="medium" className="bg-[#121213] text-white font-bold">
-                          {isPt ? 'MÉDIO (5 LETRAS / PADRÃO)' : 'MEDIUM (5 LETTERS / STANDARD)'}
+                          {isPt ? 'MÉDIO (5 LETRAS / PADRÃO)' : isEs ? 'MEDIO (5 LETRAS / ESTÁNDAR)' : 'MEDIUM (5 LETTERS / STANDARD)'}
                         </option>
                         <option value="hard" className="bg-[#121213] text-white font-bold">
-                          {isPt ? 'DIFÍCIL (6 LETRAS / EXÓTICO)' : 'HARD (6 LETTERS / EXOTIC)'}
+                          {isPt ? 'DIFÍCIL (6 LETRAS / EXÓTICO)' : isEs ? 'DIFÍCIL (6 LETRAS / EXÓTICO)' : 'HARD (6 LETTERS / EXOTIC)'}
                         </option>
                       </select>
                       <ChevronDown className="w-3.5 h-3.5 text-[#818384] absolute col-end-1 right-2.5 top-2.5 pointer-events-none" />
@@ -310,8 +321,8 @@ export default function LLMConsole({
                       className="w-full h-1.5 bg-[#3a3a3c] rounded appearance-none cursor-pointer accent-emerald-500"
                     />
                     <div className="flex justify-between text-[8px] text-[#818384] font-bold uppercase tracking-wider">
-                      <span>{isPt ? 'Determinístico' : 'Deterministic'}</span>
-                      <span>{isPt ? 'Criativo / Complexo' : 'Creative / Complex'}</span>
+                      <span>{isPt ? 'Determinístico' : isEs ? 'Determinista' : 'Deterministic'}</span>
+                      <span>{isPt ? 'Criativo / Complexo' : isEs ? 'Creativo / Complejo' : 'Creative / Complex'}</span>
                     </div>
                   </div>
 

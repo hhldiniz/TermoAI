@@ -45,7 +45,7 @@ export interface GameStats {
 }
 
 export interface GameSettings {
-  language: 'pt' | 'en';
+  language: 'pt' | 'en' | 'es';
   soundEnabled: boolean;
   hardMode: boolean;
   autoRevealClue: boolean;

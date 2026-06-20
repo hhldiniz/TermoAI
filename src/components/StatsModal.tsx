@@ -6,7 +6,7 @@ interface StatsModalProps {
   isOpen: boolean;
   onClose: () => void;
   stats: GameStats;
-  language: 'pt' | 'en';
+  language: 'pt' | 'en' | 'es';
   onResetStats: () => void;
   isGameFinished: boolean;
   onNewGame: () => void;
@@ -26,14 +26,15 @@ export default function StatsModal({
   if (!isOpen) return null;
 
   const isPt = language === 'pt';
-  const labelTitle = isPt ? 'Estatísticas' : 'Statistics';
-  const labelPlayed = isPt ? 'Jogos' : 'Played';
-  const labelWinPct = isPt ? 'Vitórias' : 'Win %';
-  const labelCurStreak = isPt ? 'Seq. Atual' : 'Cur Streak';
-  const labelMaxStreak = isPt ? 'Seq. Máx' : 'Max Streak';
-  const labelDistribution = isPt ? 'Distribuição de Tentativas' : 'Guess Distribution';
-  const labelNewGame = isPt ? 'Novo Jogo' : 'New Game';
-  const labelReset = isPt ? 'Limpar Dados' : 'Reset Stats';
+  const isEs = language === 'es';
+  const labelTitle = isPt ? 'Estatísticas' : isEs ? 'Estadísticas' : 'Statistics';
+  const labelPlayed = isPt ? 'Jogos' : isEs ? 'Partidas' : 'Played';
+  const labelWinPct = isPt ? 'Vitórias' : isEs ? 'Victorias' : 'Win %';
+  const labelCurStreak = isPt ? 'Seq. Atual' : isEs ? 'Racha Ac.' : 'Cur Streak';
+  const labelMaxStreak = isPt ? 'Seq. Máx' : isEs ? 'Racha Máx.' : 'Max Streak';
+  const labelDistribution = isPt ? 'Distribuição de Tentativas' : isEs ? 'Distribución de Intentos' : 'Guess Distribution';
+  const labelNewGame = isPt ? 'Novo Jogo' : isEs ? 'Nuevo Juego' : 'New Game';
+  const labelReset = isPt ? 'Limpar Dados' : isEs ? 'Restablecer' : 'Reset Stats';
 
   const totalGames = stats.gamesPlayed || 0;
   const winPercent = totalGames > 0 ? Math.round((stats.gamesWon / totalGames) * 100) : 0;
@@ -131,7 +132,7 @@ export default function StatsModal({
           {/* Wipe button */}
           <button
             onClick={() => {
-              if (confirm(isPt ? 'Deseja mesmo resetar todos os dados salvos?' : 'Are you sure you want to reset all saved records?')) {
+              if (confirm(isPt ? 'Deseja mesmo resetar todos os dados salvos?' : isEs ? '¿Seguro que quieres borrar todos los datos guardados?' : 'Are you sure you want to reset all saved records?')) {
                 triggerSound('click');
                 onResetStats();
               }

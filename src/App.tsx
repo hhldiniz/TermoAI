@@ -57,6 +57,7 @@ export default function App() {
   }, [stats]);
 
   const isPt = settings.language === 'pt';
+  const isEs = settings.language === 'es';
 
   // Play Sound helper safeguarding settings toggle
   const triggerSound = useCallback((type: 'click' | 'flip' | 'win' | 'lose' | 'error') => {
@@ -449,14 +450,14 @@ export default function App() {
 
     // Validate size
     if (normalizedGuess.length !== wordLength) {
-      showAlert(isPt ? `Digite ${wordLength} letras!` : `Guess must be exactly ${wordLength} letters!`);
+      showAlert(isPt ? `Digite ${wordLength} letras!` : isEs ? `¡Introduce ${wordLength} letras!` : `Guess must be exactly ${wordLength} letters!`);
       triggerErrorShaking();
       return;
     }
 
     // Validate standard alpha characters
-    if (!/^[A-ZÇ]+$/.test(normalizedGuess) || normalizedGuess.length !== wordLength) {
-      showAlert(isPt ? 'Use apenas letras normais!' : 'Only valid alphabet characters are accepted!');
+    if (!/^[A-ZÇÑ]+$/.test(normalizedGuess) || normalizedGuess.length !== wordLength) {
+      showAlert(isPt ? 'Use apenas letras normais!' : isEs ? '¡Utiliza solo letras válidas!' : 'Only valid alphabet characters are accepted!');
       triggerErrorShaking();
       return;
     }
@@ -469,7 +470,9 @@ export default function App() {
         if (lastEval[i].status === 'correct' && normalizedGuess[i] !== lastEval[i].char) {
           showAlert(isPt 
             ? `A ${i+1}ª letra deve ser ${lastEval[i].char}!` 
-            : `The ${i+1}th character must be ${lastEval[i].char}!`);
+            : isEs
+              ? `¡La ${i+1}ª letra debe ser ${lastEval[i].char}!`
+              : `The ${i+1}th character must be ${lastEval[i].char}!`);
           triggerErrorShaking();
           return;
         }
@@ -557,10 +560,14 @@ export default function App() {
         setSurvivalInput(prev => prev.slice(0, -1));
       } else if (normalizedKey === 'ENTER') {
         submitSurvivalFullGuess();
-      } else if (/^[A-ZÇ]$/.test(normalizedKey)) {
+      } else if (/^[A-ZÇÑ]$/.test(normalizedKey)) {
         const mL = survivalWord ? survivalWord.word.length : 15;
         if (survivalInput.length < mL) {
-          const sanitized = normalizedKey === 'Ç' && !isPt ? 'C' : normalizedKey;
+          const sanitized = normalizedKey === 'Ç' && !isPt
+            ? 'C'
+            : normalizedKey === 'Ñ' && !isEs
+              ? 'N'
+              : normalizedKey;
           setSurvivalInput(prev => prev + sanitized);
         }
       }
@@ -573,10 +580,14 @@ export default function App() {
         setEnigmaInput(prev => prev.slice(0, -1));
       } else if (normalizedKey === 'ENTER') {
         submitEnigmaFullGuess();
-      } else if (/^[A-ZÇ]$/.test(normalizedKey)) {
+      } else if (/^[A-ZÇÑ]$/.test(normalizedKey)) {
         const mL = enigmaWord ? enigmaWord.word.length : 15;
         if (enigmaInput.length < mL) {
-          const sanitized = normalizedKey === 'Ç' && !isPt ? 'C' : normalizedKey;
+          const sanitized = normalizedKey === 'Ç' && !isPt
+            ? 'C'
+            : normalizedKey === 'Ñ' && !isEs
+              ? 'N'
+              : normalizedKey;
           setEnigmaInput(prev => prev + sanitized);
         }
       }
@@ -589,13 +600,17 @@ export default function App() {
       setCurrentGuess(prev => prev.slice(0, -1));
     } else if (normalizedKey === 'ENTER') {
       handleSubmitGuess();
-    } else if (/^[A-ZÇ]$/.test(normalizedKey) && currentGuess.length < wordLength) {
-      // Filter ç into c if English mode, allow otherwise
-      const sanitized = normalizedKey === 'Ç' && !isPt ? 'C' : normalizedKey;
+    } else if (/^[A-ZÇÑ]$/.test(normalizedKey) && currentGuess.length < wordLength) {
+      // Filter ç into c and ñ into n if not their native settings, allow otherwise
+      const sanitized = normalizedKey === 'Ç' && !isPt
+        ? 'C'
+        : normalizedKey === 'Ñ' && !isEs
+          ? 'N'
+          : normalizedKey;
       setCurrentGuess(prev => prev + sanitized);
     }
   }, [
-    currentGuess, isGenerating, gameStatus, isPt, guesses.length, gameMode, 
+    currentGuess, isGenerating, gameStatus, isPt, isEs, guesses.length, gameMode, 
     enigmaStatus, enigmaWord, enigmaInput, submitEnigmaFullGuess,
     survivalStatus, survivalWord, survivalInput, submitSurvivalFullGuess, isSurvivalTransitioning
   ]);
@@ -614,7 +629,7 @@ export default function App() {
         handleKeyPress('BACKSPACE');
       } else if (key === 'ENTER') {
         handleKeyPress('ENTER');
-      } else if (/^[A-ZÇ]$/.test(key)) {
+      } else if (/^[A-ZÇÑ]$/.test(key)) {
         handleKeyPress(key);
       }
     };
@@ -902,16 +917,19 @@ export default function App() {
 
             {/* Language indicator on the fly */}
             <div className="mt-6 sm:mt-8 flex gap-2 items-center text-[10px] sm:text-xs text-slate-500 bg-[#1a1a1b] py-1.5 px-3 rounded-full border border-[#3a3a3c]">
-              <span>{isPt ? 'Idioma:' : 'Language:'}</span>
+              <span>{isPt ? 'Idioma:' : isEs ? 'Idioma:' : 'Language:'}</span>
               <button 
                 onClick={() => {
                   triggerSound('click');
-                  setSettings(p => ({ ...p, language: p.language === 'pt' ? 'en' : 'pt' }));
+                  setSettings(p => ({ 
+                    ...p, 
+                    language: p.language === 'pt' ? 'en' : p.language === 'en' ? 'es' : 'pt' 
+                  }));
                 }}
-                className="font-black text-emerald-400 hover:underline hover:text-white pointer-events-auto"
-                title={isPt ? 'Mudar para Inglês' : 'Switch to Portuguese'}
+                className="font-black text-emerald-400 hover:underline hover:text-white pointer-events-auto cursor-pointer"
+                title={isPt ? 'Mudar Idioma' : isEs ? 'Cambiar Idioma' : 'Switch Language'}
               >
-                {isPt ? 'Português (BR)' : 'English (US)'}
+                {settings.language === 'pt' ? 'Português (BR)' : settings.language === 'es' ? 'Español (ES)' : 'English (US)'}
               </button>
             </div>
 
@@ -944,7 +962,7 @@ export default function App() {
                   {/* Clue revealing or solved text */}
                   {revealedCount > 0 ? (
                     <p className="text-[10px] sm:text-[11px] text-slate-100 font-bold leading-snug mt-0.5 sm:mt-1 animate-in fade-in slide-in-from-top-1 px-1.5 animate-bounce">
-                      <span className="font-extrabold text-emerald-500 not-italic uppercase tracking-widest block text-[8px] sm:text-[9px] mb-0">{isPt ? '⚡ Dica Lógica:' : '⚡ AI Hint:'}</span>
+                      <span className="font-extrabold text-emerald-500 not-italic uppercase tracking-widest block text-[8px] sm:text-[9px] mb-0">{isPt ? '⚡ Dica Lógica:' : isEs ? '⚡ Pista Lógica:' : '⚡ AI Hint:'}</span>
                       "{activeWord.clue}"
                     </p>
                   ) : (
@@ -953,12 +971,12 @@ export default function App() {
                       onClick={() => {
                         triggerSound('click');
                         setRevealedCount(1);
-                        pushLog('info', isPt ? 'Clue consultado pelo Oracle.' : 'Clue queried by user.');
+                        pushLog('info', isPt ? 'Clue consultado pelo Oracle.' : isEs ? 'Pista consultada al Oráculo de IA.' : 'Clue queried by user.');
                       }}
                       className="mt-1 flex items-center gap-1.5 text-[9px] sm:text-[10px] bg-white text-black hover:bg-emerald-500 hover:text-white font-black uppercase tracking-widest py-1 px-2.5 sm:py-1.5 sm:px-3 rounded transition-colors active:scale-95 cursor-pointer"
                     >
                       <Cpu className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                      {isPt ? 'Consultar Oracle LLM' : 'Consult Local LLM Oracle'}
+                      {isPt ? 'Consultar Oracle LLM' : isEs ? 'Consultar Oráculo LLM' : 'Consult Local LLM Oracle'}
                     </button>
                   )}
 
@@ -966,7 +984,7 @@ export default function App() {
                   {gameStatus !== 'playing' && (
                     <div className="absolute inset-0 bg-[#1a1a1b] rounded flex flex-col items-center justify-center px-4 py-2 border border-[#3a3a3c] animate-in fade-in zoom-in-95 duration-200 z-10">
                       <p className={`text-xs font-black tracking-widest uppercase ${gameStatus === 'won' ? 'text-emerald-500' : 'text-rose-500'}`}>
-                        {gameStatus === 'won' ? (isPt ? 'Vitória! 🎉' : 'Victory Resolved! 🎉') : (isPt ? 'Derrota! 💀' : 'Defeated! 💀')}
+                        {gameStatus === 'won' ? (isPt ? 'Vitória! 🎉' : isEs ? '¡Victoria! 🎉' : 'Victory Resolved! 🎉') : (isPt ? 'Derrota! 💀' : isEs ? '¡Derrota! 💀' : 'Defeated! 💀')}
                       </p>
                       <h3 className="text-xl font-black text-white tracking-[0.2em] font-mono select-text mt-0.5 uppercase">
                         {activeWord.word}
@@ -975,7 +993,7 @@ export default function App() {
                         onClick={() => { triggerSound('click'); generateNewWord(); }}
                         className="mt-2 bg-white text-black hover:bg-emerald-500 hover:text-white font-black text-[10px] uppercase tracking-widest py-1.5 px-4 rounded transition-colors active:scale-95 cursor-pointer"
                       >
-                        {isPt ? 'Próxima Palavra' : 'Next Puzzle'}
+                        {isPt ? 'Próxima Palavra' : isEs ? 'Siguiente Palabra' : 'Next Puzzle'}
                       </button>
                     </div>
                   )}
@@ -983,7 +1001,7 @@ export default function App() {
               ) : (
                 <div className="h-14 flex items-center justify-center font-mono text-xs text-[#818384] select-none gap-2">
                   <RefreshCw className="w-4 h-4 animate-spin text-emerald-500" />
-                  <span>{isPt ? 'Gerando palavra...' : 'Sampling local token weights...'}</span>
+                  <span>{isPt ? 'Gerando palavra...' : isEs ? 'Generando palabra...' : 'Sampling local token weights...'}</span>
                 </div>
               )}
             </div>
