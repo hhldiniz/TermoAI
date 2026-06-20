@@ -850,6 +850,23 @@ export function generateWordOffline(
   temp: number,
   difficulty: 'easy' | 'medium' | 'hard' = 'medium'
 ): WordData {
+  let usedWordsHistory: string[] = [];
+  if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+    try {
+      const raw = localStorage.getItem('termo_used_words_history');
+      if (raw) {
+        const parsed: { word: string; timestamp: number }[] = JSON.parse(raw);
+        const now = Date.now();
+        const oneDayMs = 24 * 60 * 60 * 1000;
+        usedWordsHistory = parsed
+          .filter(r => now - r.timestamp < oneDayMs)
+          .map(r => r.word.toUpperCase());
+      }
+    } catch (e) {
+      console.error('Error reading word history', e);
+    }
+  }
+
   const dictionary = getWordsByLanguage(lang);
   let candidates = dictionary;
 
@@ -879,18 +896,51 @@ export function generateWordOffline(
     );
   }
 
-  if (candidates.length === 0) {
+  // Filter out recently used words
+  let availableCandidates = candidates.filter(w => !usedWordsHistory.includes(w.word.toUpperCase()));
+  if (availableCandidates.length === 0) {
+    // If all candidates in this specific category or difficulty are used, fallback to standard candidates
+    availableCandidates = candidates;
+  }
+
+  if (availableCandidates.length === 0) {
     // fallback to just length filtering if no words in this category have this length
-    candidates = dictionary.filter((w) => w.word.length === targetLength);
+    const lengthCandidates = dictionary.filter((w) => w.word.length === targetLength);
+    availableCandidates = lengthCandidates.filter(w => !usedWordsHistory.includes(w.word.toUpperCase()));
+    if (availableCandidates.length === 0) {
+      availableCandidates = lengthCandidates;
+    }
   }
 
-  if (candidates.length === 0) {
-    candidates = dictionary; // fallback of last resort
+  if (availableCandidates.length === 0) {
+    availableCandidates = dictionary; // fallback of last resort
   }
 
-  // Choose a random word from candidate set
-  const randomIndex = Math.floor(Math.random() * candidates.length);
-  return candidates[randomIndex];
+  // Choose a random word from available candidate set
+  const randomIndex = Math.floor(Math.random() * availableCandidates.length);
+  const chosen = availableCandidates[randomIndex];
+
+  // Record it in the 24h history
+  if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+    try {
+      const raw = localStorage.getItem('termo_used_words_history');
+      let parsed: { word: string; timestamp: number }[] = [];
+      if (raw) {
+        parsed = JSON.parse(raw);
+      }
+      const now = Date.now();
+      const oneDayMs = 24 * 60 * 60 * 1000;
+      const updated = [
+        ...parsed.filter(r => now - r.timestamp < oneDayMs),
+        { word: chosen.word.toUpperCase(), timestamp: now }
+      ];
+      localStorage.setItem('termo_used_words_history', JSON.stringify(updated));
+    } catch (e) {
+      console.error('Error saving word history', e);
+    }
+  }
+
+  return chosen;
 }
 
 // Full vocabulary of legal 5-letter search terms for validating user guesses in Termo.
@@ -973,7 +1023,51 @@ export const LARGE_WORDS_EN: LargeWordData[] = [
 ];
 
 export function getRandomLargeWord(lang: 'pt' | 'en'): LargeWordData {
+  let usedWordsHistory: string[] = [];
+  if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+    try {
+      const raw = localStorage.getItem('termo_used_words_history');
+      if (raw) {
+        const parsed: { word: string; timestamp: number }[] = JSON.parse(raw);
+        const now = Date.now();
+        const oneDayMs = 24 * 60 * 60 * 1000;
+        usedWordsHistory = parsed
+          .filter(r => now - r.timestamp < oneDayMs)
+          .map(r => r.word.toUpperCase());
+      }
+    } catch (e) {
+      console.error('Error reading word history', e);
+    }
+  }
+
   const list = lang === 'pt' ? LARGE_WORDS_PT : LARGE_WORDS_EN;
-  const idx = Math.floor(Math.random() * list.length);
-  return list[idx];
+  let available = list.filter(w => !usedWordsHistory.includes(w.word.toUpperCase()));
+  if (available.length === 0) {
+    available = list; // fallback if all used
+  }
+
+  const idx = Math.floor(Math.random() * available.length);
+  const chosen = available[idx];
+
+  // Record it in the 24h history
+  if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+    try {
+      const raw = localStorage.getItem('termo_used_words_history');
+      let parsed: { word: string; timestamp: number }[] = [];
+      if (raw) {
+        parsed = JSON.parse(raw);
+      }
+      const now = Date.now();
+      const oneDayMs = 24 * 60 * 60 * 1000;
+      const updated = [
+        ...parsed.filter(r => now - r.timestamp < oneDayMs),
+        { word: chosen.word.toUpperCase(), timestamp: now }
+      ];
+      localStorage.setItem('termo_used_words_history', JSON.stringify(updated));
+    } catch (e) {
+      console.error('Error saving word history', e);
+    }
+  }
+
+  return chosen;
 }

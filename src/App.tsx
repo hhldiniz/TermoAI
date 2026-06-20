@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { HelpCircle, BarChart3, Settings, AlertCircle, RefreshCw, Cpu, Check, HelpCircle as HelpIcon, Sparkles } from 'lucide-react';
+import { HelpCircle, BarChart3, Settings, AlertCircle, RefreshCw, Cpu, Check, HelpCircle as HelpIcon, Sparkles, Heart, Trophy } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { GameStatus, LetterEvaluation, LetterStatus, GameStats, GameSettings, LLMConfig, LLMLog, WordData } from './types';
 import { generateWordOffline, normalizeText, isValidGuess, getWordsByLanguage, getRandomLargeWord, LargeWordData } from './words';
 import { playSound } from './utils/audio';
@@ -74,7 +75,109 @@ export default function App() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // --- MULTI-GAME MODE SYSTEM ---
-  const [gameMode, setGameMode] = useState<'menu' | 'standard' | 'enigma'>('menu');
+  const [gameMode, setGameMode] = useState<'menu' | 'standard' | 'enigma' | 'survival'>('menu');
+
+  // --- SURVIVAL MODE STATES ---
+  const [survivalWord, setSurvivalWord] = useState<LargeWordData | null>(null);
+  const [survivalRevealedLetters, setSurvivalRevealedLetters] = useState<string[]>([]);
+  const [survivalGuesses, setSurvivalGuesses] = useState<string[]>([]);
+  const [survivalInput, setSurvivalInput] = useState('');
+  const [survivalLives, setSurvivalLives] = useState(3);
+  const [survivalStreak, setSurvivalStreak] = useState(0);
+  const [survivalStatus, setSurvivalStatus] = useState<GameStatus>('playing');
+  const [survivalMessage, setSurvivalMessage] = useState<string | null>(null);
+  const [isSurvivalTransitioning, setIsSurvivalTransitioning] = useState(false);
+
+  const startSurvivalGame = () => {
+    setSurvivalStreak(0);
+    setSurvivalLives(3);
+    setGameMode('survival');
+    triggerSound('click');
+    loadNextSurvivalWord(true);
+  };
+
+  const loadNextSurvivalWord = (isFresh = false) => {
+    const wordObj = getRandomLargeWord(settings.language);
+    setSurvivalWord(wordObj);
+    setSurvivalRevealedLetters([]);
+    setSurvivalGuesses([]);
+    setSurvivalInput('');
+    setSurvivalStatus('playing');
+    setSurvivalMessage(null);
+    setIsSurvivalTransitioning(false);
+    if (!isFresh) {
+      pushLog('system', isPt ? `Sobrevivência: Nova palavra carregada.` : `Survival: New word loaded.`);
+    } else {
+      pushLog('system', isPt ? 'Arquitetura de Sobrevivência ativada. 3 Vidas restantes!' : 'Survival computing mode active. 3 Lives allocated!');
+    }
+  };
+
+  const submitSurvivalFullGuess = () => {
+    if (!survivalWord || survivalStatus !== 'playing' || isSurvivalTransitioning) return;
+    const cleanGuess = normalizeText(survivalInput);
+    if (!cleanGuess) return;
+
+    if (cleanGuess === normalizeText(survivalWord.word)) {
+      setSurvivalStatus('won');
+      triggerSound('win');
+      setSurvivalRevealedLetters(survivalWord.word.split(''));
+      setSurvivalInput('');
+      setSurvivalMessage(null);
+      setSurvivalStreak(prev => prev + 1);
+      pushLog('success', isPt 
+        ? `Incrível! Palavra correta! Sequência atual: ${survivalStreak + 1} acertos.`
+        : `Outstanding! Correct word! Current streak: ${survivalStreak + 1} solved.`
+      );
+      
+      setIsSurvivalTransitioning(true);
+      // Auto transition to next word in 2.5 seconds
+      setTimeout(() => {
+        setSurvivalStatus(prevStatus => {
+          if (prevStatus === 'won') {
+            loadNextSurvivalWord(false);
+          }
+          return prevStatus;
+        });
+      }, 2500);
+
+    } else {
+      triggerSound('error');
+      setSurvivalGuesses(prev => {
+        if (prev.includes(cleanGuess)) return prev;
+        return [...prev, cleanGuess];
+      });
+      
+      setSurvivalLives(prevLives => {
+        const nextLives = Math.max(0, prevLives - 1);
+        if (nextLives === 0) {
+          setSurvivalStatus('lost');
+          triggerSound('lose');
+          setSurvivalMessage(isPt ? `Game Over! Palavra extra: ${survivalWord.word}` : `Game Over! Extra word was: ${survivalWord.word}`);
+          pushLog('warning', isPt
+            ? `Histórico de sobrevivência finalizado! Sequência obtida: ${survivalStreak} acertos.`
+            : `Survival sequence finished! Final streak: ${survivalStreak} solved.`
+          );
+        } else {
+          setSurvivalMessage(isPt 
+            ? `Incorreto! Restam ${nextLives} vidas. Carregando próxima palavra...` 
+            : `Incorrect! ${nextLives} lives left. Loading next word...`
+          );
+          pushLog('info', isPt 
+            ? `Erro de digitação: [${cleanGuess}]. Restam ${nextLives} vidas.` 
+            : `Mispelled: [${cleanGuess}]. ${nextLives} lives remaining.`
+          );
+          
+          setIsSurvivalTransitioning(true);
+          // Auto transition to next word in 2.5 seconds
+          setTimeout(() => {
+            loadNextSurvivalWord(false);
+          }, 2500);
+        }
+        return nextLives;
+      });
+      setSurvivalInput('');
+    }
+  };
 
   // LLM Engine Console States
   const [logs, setLogs] = useState<LLMLog[]>([]);
@@ -448,6 +551,22 @@ export default function App() {
   const handleKeyPress = useCallback((key: string) => {
     const normalizedKey = key.toUpperCase();
 
+    if (gameMode === 'survival') {
+      if (survivalStatus !== 'playing' || isSurvivalTransitioning) return;
+      if (normalizedKey === 'BACKSPACE') {
+        setSurvivalInput(prev => prev.slice(0, -1));
+      } else if (normalizedKey === 'ENTER') {
+        submitSurvivalFullGuess();
+      } else if (/^[A-ZÇ]$/.test(normalizedKey)) {
+        const mL = survivalWord ? survivalWord.word.length : 15;
+        if (survivalInput.length < mL) {
+          const sanitized = normalizedKey === 'Ç' && !isPt ? 'C' : normalizedKey;
+          setSurvivalInput(prev => prev + sanitized);
+        }
+      }
+      return;
+    }
+
     if (gameMode === 'enigma') {
       if (enigmaStatus !== 'playing') return;
       if (normalizedKey === 'BACKSPACE') {
@@ -475,7 +594,11 @@ export default function App() {
       const sanitized = normalizedKey === 'Ç' && !isPt ? 'C' : normalizedKey;
       setCurrentGuess(prev => prev + sanitized);
     }
-  }, [currentGuess, isGenerating, gameStatus, isPt, guesses.length, gameMode, enigmaStatus, enigmaWord, enigmaInput, submitEnigmaFullGuess]);
+  }, [
+    currentGuess, isGenerating, gameStatus, isPt, guesses.length, gameMode, 
+    enigmaStatus, enigmaWord, enigmaInput, submitEnigmaFullGuess,
+    survivalStatus, survivalWord, survivalInput, submitSurvivalFullGuess, isSurvivalTransitioning
+  ]);
 
   // Capturing physical machine keyboard keys
   useEffect(() => {
@@ -519,6 +642,26 @@ export default function App() {
   });
 
   const getKeyStatuses = () => {
+    if (gameMode === 'survival') {
+      const statuses: Record<string, LetterStatus> = {};
+      if (!survivalWord) return statuses;
+      
+      // Revealed letters are marked as correct (green)
+      survivalRevealedLetters.forEach(char => {
+        statuses[char] = 'correct';
+      });
+
+      // Guessed letters not in the word are marked as incorrect (dark gray)
+      survivalGuesses.forEach(guess => {
+        guess.split('').forEach(char => {
+          if (!survivalWord.word.includes(char)) {
+            statuses[char] = 'incorrect';
+          }
+        });
+      });
+
+      return statuses;
+    }
     if (gameMode === 'enigma') {
       const statuses: Record<string, LetterStatus> = {};
       if (!enigmaWord) return statuses;
@@ -616,13 +759,23 @@ export default function App() {
             <span className="hidden sm:inline text-[9px] uppercase tracking-[0.25em] text-emerald-500 font-bold leading-none mb-1 text-center font-mono">
               {gameMode === 'enigma' 
                 ? (isPt ? 'DESCRIPTOGRAFIA ENIGMA' : 'ENIGMA DECRYPTION') 
-                : (isPt ? 'Mecanismo LLM Ativo' : 'Local LLM Active')}
+                : gameMode === 'survival'
+                  ? (isPt ? 'SOBREVIVÊNCIA 3 VIDAS' : '3 LIVES SURVIVAL')
+                  : (isPt ? 'Mecanismo LLM Ativo' : 'Local LLM Active')}
             </span>
             <span className="inline sm:hidden text-[8px] uppercase tracking-[0.15em] text-emerald-500 font-bold leading-none mb-0.5 text-center font-mono">
-              {gameMode === 'enigma' ? 'ENIGMA' : (isPt ? 'LLM Ativo' : 'LLM Active')}
+              {gameMode === 'enigma' 
+                ? 'ENIGMA' 
+                : gameMode === 'survival' 
+                  ? 'SOBREVIVÊNCIA' 
+                  : (isPt ? 'LLM Ativo' : 'LLM Active')}
             </span>
             <h1 className="text-lg sm:text-2xl font-black tracking-tighter leading-none text-white text-center">
-              {gameMode === 'enigma' ? 'ENIGMA' : 'TERMO'}<span className="text-emerald-500 underline decoration-2 underline-offset-4">AI</span>
+              {gameMode === 'enigma' 
+                ? 'ENIGMA' 
+                : gameMode === 'survival' 
+                  ? 'SOBREVIVÊNCIA' 
+                  : 'TERMO'}<span className="text-emerald-500 underline decoration-2 underline-offset-4">AI</span>
             </h1>
           </div>
 
@@ -720,6 +873,29 @@ export default function App() {
                   {isPt 
                     ? 'Palavras médias (5 a 8 letras) escondidas. Peça letras de dica que aparecem na palavra mas reduzem seu escore final!'
                     : 'Medium hidden words (5 to 8 letters). Ask for correct letters that appear everywhere but reduce your final score!'}
+                </p>
+              </button>
+
+              {/* Option 3: Survival */}
+              <button
+                onClick={() => {
+                  startSurvivalGame();
+                }}
+                className="w-full p-3 sm:p-4 rounded-xl bg-[#1a1a1b] border border-[#3a3a3c] hover:border-rose-500/50 hover:bg-[#202021] text-left transition-all duration-300 active:scale-[0.98] group flex flex-col cursor-pointer"
+              >
+                <div className="flex items-center justify-between w-full mb-1">
+                  <span className="font-extrabold text-xs sm:text-sm text-white group-hover:text-[#f43f5e] transition-colors flex items-center gap-1.5">
+                    <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500 animate-pulse shrink-0" />
+                    {isPt ? 'Modo Sobrevivência' : 'Survival Mode'}
+                  </span>
+                  <span className="text-[8px] sm:text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                    {isPt ? '3 Vidas' : '3 Lives'}
+                  </span>
+                </div>
+                <p className="text-[10px] sm:text-xs text-slate-400 leading-snug">
+                  {isPt 
+                    ? 'Acerte palavras seguidas em série. Você começa com 3 vidas e perde uma vida a cada palpite incorreto!'
+                    : 'Solve consecutive secrets in a row. Start with 3 lives and lose a life on every wrong full word guess!'}
                 </p>
               </button>
             </div>
@@ -1008,6 +1184,235 @@ export default function App() {
                       {isPt 
                         ? `A palavra encriptada era ${enigmaWord.word}` 
                         : `The encrypted secret word was ${enigmaWord.word}`}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* --- SURVIVAL MODE VIEWPLAY --- */}
+        {gameMode === 'survival' && survivalWord && (
+          <>
+            {/* Category / Clue Concept Indicator */}
+            <div className="px-4 mt-0.5 sm:mt-2 flex flex-col gap-1 sm:gap-2 relative z-10 shrink-0 select-none text-center max-w-md mx-auto w-full animate-in fade-in slide-in-from-top-2 duration-300">
+              <div className="bg-[#1a1a1b] p-2 sm:p-3 rounded border border-rose-500/20 flex flex-col items-center justify-center text-xs relative w-full">
+                <div className="flex gap-2 items-center mb-1">
+                  <span className="text-[10px] font-bold text-rose-400 uppercase tracking-widest font-mono">
+                    {isPt ? 'Categoria:' : 'Category:'} {isPt && survivalWord.category === 'Nature' ? 'Natureza' : survivalWord.category}
+                  </span>
+                  <motion.span
+                    key={survivalStreak}
+                    initial={{ scale: 1 }}
+                    animate={survivalStreak > 0 ? {
+                      scale: [1, 1.25, 1],
+                      borderColor: ["rgba(244,63,94,0.2)", "rgba(249,115,22,0.8)", "rgba(244,63,94,0.2)"],
+                      backgroundColor: ["rgba(244,63,94,0.1)", "rgba(249,115,22,0.25)", "rgba(244,63,94,0.1)"],
+                      boxShadow: [
+                        "0 0 0px rgba(0,0,0,0)",
+                        "0 0 12px rgba(249,115,22,0.6)",
+                        "0 0 0px rgba(0,0,0,0)"
+                      ]
+                    } : {}}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                    className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 uppercase tracking-wider font-mono flex items-center gap-1 relative overflow-visible"
+                  >
+                    <Trophy className={`w-3 h-3 transition-colors duration-300 ${survivalStreak >= 3 ? 'text-amber-400 animate-bounce' : 'text-rose-400'}`} />
+                    <span>{isPt ? `${survivalStreak} Acertos` : `${survivalStreak} Solved`}</span>
+
+                    {/* Subtle Fire 'On Fire' Indicator if streak >= 3 */}
+                    {survivalStreak >= 3 && (
+                      <motion.span
+                        animate={{ scale: [1, 1.2, 1], y: [0, -1, 0] }}
+                        transition={{ repeat: Infinity, duration: 1.2, ease: "easeInOut" }}
+                        className="text-[10px] select-none text-orange-500 ml-0.5"
+                      >
+                        🔥
+                      </motion.span>
+                    )}
+
+                    {/* Particles popping out on increment */}
+                    <AnimatePresence>
+                      {survivalStatus === 'won' && (
+                        <span className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                          {/* Left sparkle */}
+                          <motion.span
+                            initial={{ x: 0, y: 0, scale: 0, opacity: 1 }}
+                            animate={{ x: -22, y: -18, scale: 1.3, opacity: 0, rotate: 45 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.8, ease: "easeOut" }}
+                            className="absolute text-orange-400"
+                          >
+                            <Sparkles className="w-3.5 h-3.5 fill-orange-400 text-orange-400" />
+                          </motion.span>
+                          {/* Right sparkle */}
+                          <motion.span
+                            initial={{ x: 0, y: 0, scale: 0, opacity: 1 }}
+                            animate={{ x: 22, y: -18, scale: 1.3, opacity: 0, rotate: -45 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.8, ease: "easeOut", delay: 0.08 }}
+                            className="absolute text-yellow-400"
+                          >
+                            <Sparkles className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                          </motion.span>
+                          {/* Centered Fire sparkle */}
+                          <motion.span
+                            initial={{ x: 0, y: 5, scale: 0.2, opacity: 1 }}
+                            animate={{ x: -4, y: -26, scale: 1.5, opacity: 0 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.9, ease: "easeOut", delay: 0.04 }}
+                            className="absolute text-red-500 text-xs select-none"
+                          >
+                            🔥
+                          </motion.span>
+                          {/* Secondary Fire sparkle */}
+                          <motion.span
+                            initial={{ x: 0, y: 5, scale: 0.2, opacity: 1 }}
+                            animate={{ x: 6, y: -26, scale: 1.5, opacity: 0 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.9, ease: "easeOut", delay: 0.12 }}
+                            className="absolute text-orange-500 text-xs select-none"
+                          >
+                            🔥
+                          </motion.span>
+                        </span>
+                      )}
+                    </AnimatePresence>
+                  </motion.span>
+                </div>
+                <p className="text-[10px] sm:text-[11px] text-slate-100 font-bold leading-normal px-2">
+                  <span className="font-extrabold text-rose-400 uppercase tracking-widest block text-[8px] sm:text-[9px] mb-0.5">
+                    {isPt ? '⚡ Diretriz do Clue:' : '⚡ Concept Prompt:'}
+                  </span>
+                  "{survivalWord.clue}"
+                </p>
+              </div>
+            </div>
+
+            {/* Hidden word row display */}
+            <div className="flex-1 flex flex-col items-center justify-center py-2 px-4 select-none shrink animate-in zoom-in-95 duration-400">
+              {/* Hearts / Lives indicator */}
+              <div className="flex gap-2 items-center mb-4 select-none">
+                {Array.from({ length: 3 }).map((_, idx) => {
+                  const isHeartActive = idx < survivalLives;
+                  return (
+                    <Heart 
+                      key={idx} 
+                      className={`w-6 h-6 transition-all duration-300 ${
+                        isHeartActive 
+                          ? 'text-rose-500 fill-rose-500 scale-100 animate-pulse' 
+                          : 'text-zinc-700 fill-zinc-800 scale-90 opacity-40'
+                      }`}
+                    />
+                  );
+                })}
+              </div>
+
+              <div className="flex flex-wrap items-center justify-center gap-1 sm:gap-1.5 max-w-sm w-full mx-auto">
+                {survivalWord.word.split('').map((char, idx) => {
+                  const isRevealed = survivalRevealedLetters.includes(char) || survivalStatus !== 'playing';
+                  const isSolvedWord = survivalStatus === 'won';
+                  
+                  return (
+                    <div
+                      key={idx}
+                      className={`w-7 h-9 sm:w-9 sm:h-11 flex items-center justify-center text-sm sm:text-base font-black rounded border-2 transition-all duration-300 ${
+                        isRevealed
+                          ? isSolvedWord
+                            ? 'bg-[#538d4e] border-[#538d4e] text-white animate-in zoom-in duration-300'
+                            : survivalRevealedLetters.includes(char)
+                              ? 'bg-[#1b4332] border-emerald-500 text-emerald-400'
+                              : 'bg-rose-950 border-rose-600 text-rose-200'
+                          : 'bg-[#1a1a1b] border-[#3a3a3c] text-slate-700'
+                      }`}
+                    >
+                      {isRevealed ? char : '?'}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Status or skip elements */}
+              <div className="w-full flex flex-col gap-1.5 mt-3 sm:mt-4 max-w-xs mx-auto">
+                {survivalStatus !== 'playing' && survivalStatus === 'won' && (
+                  <button
+                    onClick={() => loadNextSurvivalWord(false)}
+                    className="w-full h-9 flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded py-2 font-black uppercase text-[10px] sm:text-xs transition-colors cursor-pointer"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    {isPt ? 'Próxima Palavra' : 'Next Word'}
+                  </button>
+                )}
+
+                {survivalMessage && (
+                  <div className="text-[10px] sm:text-[11px] py-1.5 px-3 rounded bg-rose-950/40 border border-rose-500/20 text-rose-400 text-center animate-bounce mt-1 font-bold font-mono">
+                    {survivalMessage}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Draft / answer typing bar */}
+            {survivalStatus === 'playing' ? (
+              <div className="w-full max-w-sm px-4 mb-2 flex flex-col gap-1 items-stretch mx-auto select-none">
+                <div className="text-[9px] uppercase tracking-widest text-[#f43f5e] font-bold text-left mb-0.5 ml-1 font-mono">
+                  {isPt ? 'Sua Resposta Completa / Letras:' : 'Your Complete Word Prediction:'}
+                </div>
+                <div className="relative flex items-center bg-[#1a1a1b] rounded-lg border border-[#3a3a3c] focus-within:border-rose-500 shadow-inner px-2.5 py-1.5 min-h-[36px] sm:min-h-[40px]">
+                  <span className="text-rose-500 font-mono font-black text-xs sm:text-sm mr-2 select-none">{'>'}</span>
+                  <input
+                    type="text"
+                    value={survivalInput}
+                    onChange={(e) => {
+                      const val = e.target.value.toUpperCase().replace(/[^A-ZÇ]/g, '');
+                      setSurvivalInput(val);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        submitSurvivalFullGuess();
+                      }
+                    }}
+                    placeholder={isPt ? "EX: COMPUTADOR" : "E.G. KEYBOARD"}
+                    className="flex-1 bg-transparent border-none outline-none text-white text-xs sm:text-sm font-black font-mono tracking-wider placeholder-slate-600 uppercase focus:ring-0"
+                    maxLength={survivalWord.word.length}
+                  />
+                  {survivalInput.length > 0 && (
+                    <button
+                      onClick={submitSurvivalFullGuess}
+                      className="ml-2 px-2.5 py-1 text-[10px] bg-rose-500 text-white font-black hover:bg-rose-400 uppercase tracking-wider rounded transition-colors active:scale-95 cursor-pointer"
+                    >
+                      {isPt ? 'Confirmar' : 'Confirm'}
+                    </button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="w-full max-w-sm px-4 mb-2 text-center mx-auto animate-in zoom-in-95 duration-200">
+                <div className={`p-2.5 sm:p-3 rounded-lg border text-xs sm:text-sm font-bold ${
+                  survivalStatus === 'won' 
+                    ? 'bg-[#1b4332] border-emerald-500 text-emerald-300' 
+                    : 'bg-rose-950/40 border-rose-500/40 text-rose-300'
+                }`}>
+                  {survivalStatus === 'won' ? (
+                    <div>
+                      <span className="block text-[9px] uppercase tracking-widest text-emerald-450 font-extrabold mb-1 font-mono">🎉 {isPt ? 'ACERTO CONCLUÍDO!' : 'CORRECT ANSWER!'}</span>
+                      {isPt 
+                        ? `Aguarde, carregando nova palavra secreta...` 
+                        : `Wait, loading the next secret word...`}
+                    </div>
+                  ) : (
+                    <div>
+                      <span className="block text-[9px] uppercase tracking-widest text-rose-450 font-extrabold mb-1 font-mono">☠️ {isPt ? 'FIM DE JOGO!' : 'GAME OVER!'}</span>
+                      {isPt 
+                        ? `Você acertou ${survivalStreak} palavras seguidas! A última palavra era: ${survivalWord.word}` 
+                        : `You solved ${survivalStreak} words in a row! The final word was: ${survivalWord.word}`}
+                      <button
+                        onClick={startSurvivalGame}
+                        className="mt-2.5 w-full py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded font-black uppercase text-[9px] sm:text-[10px] transition-colors cursor-pointer block text-center"
+                      >
+                        {isPt ? 'Tentar Novamente' : 'Try Again'}
+                      </button>
                     </div>
                   )}
                 </div>
