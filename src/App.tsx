@@ -1335,14 +1335,27 @@ export default function App() {
 
               {/* Status or skip elements */}
               <div className="w-full flex flex-col gap-1.5 mt-3 sm:mt-4 max-w-xs mx-auto">
-                {survivalStatus !== 'playing' && survivalStatus === 'won' && (
-                  <button
-                    onClick={() => loadNextSurvivalWord(false)}
-                    className="w-full h-9 flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded py-2 font-black uppercase text-[10px] sm:text-xs transition-colors cursor-pointer"
-                  >
-                    <RefreshCw className="w-4 h-4" />
-                    {isPt ? 'Próxima Palavra' : 'Next Word'}
-                  </button>
+                {isSurvivalTransitioning && (
+                  <div className="w-full mt-1 mb-2">
+                    <div className="flex justify-between items-center text-[9px] font-mono font-extrabold text-[#f43f5e] mb-1 tracking-widest uppercase">
+                      <span>{isPt ? 'PRÓXIMA PALAVRA EM...' : 'NEXT WORD IN...'}</span>
+                      <motion.span
+                        animate={{ rotate: 360 }}
+                        transition={{ repeat: Infinity, duration: 2.5, ease: "linear" }}
+                        className="inline-block text-[11px]"
+                      >
+                        ⏳
+                      </motion.span>
+                    </div>
+                    <div className="w-full h-2.5 bg-[#1a1a1b] border border-[#3a3a3c] rounded-full overflow-hidden relative">
+                      <motion.div
+                        initial={{ width: "100%" }}
+                        animate={{ width: "0%" }}
+                        transition={{ duration: 2.5, ease: "linear" }}
+                        className="h-full bg-gradient-to-r from-[#f43f5e] via-orange-500 to-yellow-400 rounded-full"
+                      />
+                    </div>
+                  </div>
                 )}
 
                 {survivalMessage && (
