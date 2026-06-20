@@ -834,7 +834,9 @@ export const ENGLISH_WORDS: WordData[] = [
 ];
 
 export function getWordsByLanguage(lang: 'pt' | 'en'): WordData[] {
-  return lang === 'pt' ? PORTUGUESE_WORDS : ENGLISH_WORDS;
+  return lang === 'pt' 
+    ? [...PORTUGUESE_WORDS, ...EXTRA_PORTUGUESE_WORDS] 
+    : [...ENGLISH_WORDS, ...EXTRA_ENGLISH_WORDS];
 }
 
 /**
@@ -1040,7 +1042,9 @@ export function getRandomLargeWord(lang: 'pt' | 'en'): LargeWordData {
     }
   }
 
-  const list = lang === 'pt' ? LARGE_WORDS_PT : LARGE_WORDS_EN;
+  const list = lang === 'pt' 
+    ? [...LARGE_WORDS_PT, ...EXTRA_LARGE_WORDS_PT] 
+    : [...LARGE_WORDS_EN, ...EXTRA_LARGE_WORDS_EN];
   let available = list.filter(w => !usedWordsHistory.includes(w.word.toUpperCase()));
   if (available.length === 0) {
     available = list; // fallback if all used
@@ -1071,3 +1075,121 @@ export function getRandomLargeWord(lang: 'pt' | 'en'): LargeWordData {
 
   return chosen;
 }
+
+// Supplementary Large/Medium/Easy Words to prevent repetitive games
+export const EXTRA_PORTUGUESE_WORDS: WordData[] = [
+  // --- FÁCIL (4 cartas/letras) ---
+  { word: 'MALA', category: 'Objetos', clue: 'Utensílio para guardar roupas em viagens.', difficulty: 'fácil', explanation: 'Substantivo simples de 4 letras que designa mala de viagem.' },
+  { word: 'CAFE', category: 'Alimentos', clue: 'Bebida quente e estimulante feita de grãos torrados.', difficulty: 'fácil', explanation: 'Infusão popular global com alta concentração de cafeína.' },
+  { word: 'ARTE', category: 'Objetos', clue: 'Expressão humana de sentimentos, ideias e estética.', difficulty: 'fácil', explanation: 'Atividade estética humana presente em toda as culturas.' },
+  { word: 'REDE', category: 'Tecnologia', clue: 'Estrutura interconectada de computadores ou fios suspensos.', difficulty: 'fácil', explanation: 'Sistema de conexões digitais ou malha de repouso.' },
+  { word: 'SUCO', category: 'Alimentos', clue: 'Líquido extraído de frutas exprimidas.', difficulty: 'fácil', explanation: 'Bebida natural rica em vitaminas extraídas diretamente de frutas.' },
+  { word: 'LAGO', category: 'Natureza', clue: 'Grande corpo de água cercado por terra.', difficulty: 'fácil', explanation: 'Reservatório natural de água doce cercado por margens terrestres.' },
+  { word: 'MAPA', category: 'Objetos', clue: 'Representação gráfica e visual de uma região geográfica.', difficulty: 'fácil', explanation: 'Instrumento cartográfico indispensável de orientação espacial.' },
+  { word: 'VACA', category: 'Animais', clue: 'Mamífero fêmea domesticado produtor de leite.', difficulty: 'fácil', explanation: 'Grande ruminante herbívoro essencial para subsistência rural.' },
+  { word: 'SOFA', category: 'Objetos', clue: 'Móvel estofado comprido com encosto para várias pessoas.', difficulty: 'fácil', explanation: 'Móvel acolchoado confortável presente na maioria das salas.' },
+  { word: 'LEAO', category: 'Animais', clue: 'Grande felino carnívoro conhecido como o rei da selva.', difficulty: 'fácil', explanation: 'Predador imponente africano símbolo de liderança e força.' },
+  { word: 'GELO', category: 'Natureza', clue: 'Água em estado sólido sob baixas temperaturas.', difficulty: 'fácil', explanation: 'Forma cristalizado-sólida de H2O abaixo de zero graus Celsius.' },
+
+  // --- MÉDIO (5 cartas/letras) ---
+  { word: 'VERDE', category: 'Natureza', clue: 'A cor característica das folhas e das plantas vivas.', difficulty: 'médio', explanation: 'Matiz cromático abundante na vegetação clorofilada terrestre.' },
+  { word: 'FORTE', category: 'Objetos', clue: 'Que tem força física ou grande resistência mecânica.', difficulty: 'médio', explanation: 'Atributo de robustez física ou fortificação de defesa militar.' },
+  { word: 'FESTA', category: 'Locais', clue: 'Reunião celebrativa animada com música e convidados.', difficulty: 'médio', explanation: 'Evento social comemorativo que promove união e alegria.' },
+  { word: 'SABOR', category: 'Alimentos', clue: 'Sensação produzida no paladar pelas substâncias alimentares.', difficulty: 'médio', explanation: 'Propriedade organoléptica estimuladora dos receptores gustativos.' },
+  { word: 'PODER', category: 'Mente', clue: 'Capacidade ou autoridade para realizar e determinar algo.', difficulty: 'médio', explanation: 'Faculdade de exercer influência ou governar estruturas.' },
+  { word: 'SAUDE', category: 'Mente', clue: 'Estado de completo bem-estar físico, mental e social.', difficulty: 'médio', explanation: 'Condição fisiológica ótima de um organismo biológico estável.' },
+  { word: 'LUGAR', category: 'Locais', clue: 'Espaço ou ponto delimitado ocupado por algo.', difficulty: 'médio', explanation: 'Conceito geográfico de localização ou porção espacial.' },
+  { word: 'VALOR', category: 'Mente', clue: 'Preço econômico ou importância moral de algo.', difficulty: 'médio', explanation: 'Atributo de relevância financeira ou princípio ético pessoal.' },
+  { word: 'CAIXA', category: 'Objetos', clue: 'Recipiente rígido com tampa para guardar ou transportar coisas.', difficulty: 'médio', explanation: 'Embalagem volumétrica tridimensional com abas ou tampa.' },
+  { word: 'CLUBE', category: 'Locais', clue: 'Associação de pessoas com interesses sociais ou esportivos.', difficulty: 'médio', explanation: 'Entidade de convívio social para recreação ou atividade física.' },
+
+  // --- DIFÍCIL (6 cartas/letras) ---
+  { word: 'BRONZE', category: 'Objetos', clue: 'Liga metálica resistente de cobre e estanho.', difficulty: 'difícil', explanation: 'Liga histórica durável utilizada em medalhas e estátuas antigas.' },
+  { word: 'VIAGEM', category: 'Locais', clue: 'O ato de ir de um lugar para outro distante.', difficulty: 'difícil', explanation: 'Deslocamento espacial de lazer ou negócios mudando de região.' },
+  { word: 'TEATRO', category: 'Locais', clue: 'Edifício onde são apresentadas peças dramáticas e musicais.', difficulty: 'difícil', explanation: 'Locus cultural dedicado a performances artísticas interpretativas vívidas.' },
+  { word: 'ESCADA', category: 'Objetos', clue: 'Série de degraus para subir ou descer níveis verticais.', difficulty: 'difícil', explanation: 'Dispositivo mecânico imóvel para transposição de altura.' },
+  { word: 'ABELHA', category: 'Animais', clue: 'Inseto voador polinizador produtor de mel saboroso.', difficulty: 'difícil', explanation: 'Importante agente ecológico himenóptero coletor de pólen.' },
+  { word: 'AGULHA', category: 'Objetos', clue: 'Pequena haste metálica pontiaguda com orifício para passar linha.', difficulty: 'difícil', explanation: 'Instrumento afiado ancestral para costura de tecidos.' },
+  { word: 'BRANCO', category: 'Objetos', clue: 'Cor pura acromática que reflete toda a luz visível.', difficulty: 'difícil', explanation: 'Oposto de preto no espectro, representando brilho integral.' },
+  { word: 'QUENTE', category: 'Natureza', clue: 'Que irradia calor elevado ou está sob alta temperatura.', difficulty: 'difícil', explanation: 'Estado de excitação molecular térmica elevada acima do padrão.' },
+  { word: 'PARQUE', category: 'Locais', clue: 'Grande área verde recreativa urbana ou reserva florestal.', difficulty: 'difícil', explanation: 'Reserva para proteção biológica ou lazer de populações locais.' },
+  { word: 'CIDADE', category: 'Locais', clue: 'Área urbana densamente povoada dotada de autogoverno.', difficulty: 'difícil', explanation: 'Assentamento humano complexo com infraestrutura desenvolvida.' },
+  { word: 'QUADRO', category: 'Objetos', clue: 'Pintura artística em tela ou placa para escrever com giz.', difficulty: 'difícil', explanation: 'Superfície plana delimitada com intuitos de exposição visual.' },
+  { word: 'PAREDE', category: 'Objetos', clue: 'Estrutura vertical sólida que divide ambientes internos.', difficulty: 'difícil', explanation: 'Barreira arquitetônica divisória e de sustentação estrutural.' }
+];
+
+export const EXTRA_ENGLISH_WORDS: WordData[] = [
+  // --- EASY (4 letters) ---
+  { word: 'GOLF', category: 'Places', clue: 'Outdoor sport played with clubs and a tiny ball on grass.', difficulty: 'fácil', explanation: 'Gentleman sport originating in Scotland requiring spacious green fields.' },
+  { word: 'LAND', category: 'Nature', clue: 'The part of the earth surface that is not covered by water.', difficulty: 'fácil', explanation: 'Dry terrestrial crust defining state boundaries and agricultural activity.' },
+  { word: 'WIND', category: 'Nature', clue: 'The natural movement of the air in the form of a current.', difficulty: 'fácil', explanation: 'Atmospheric fluid velocity displacement powered by solar heating variance.' },
+  { word: 'BIRD', category: 'Animals', clue: 'A warm-blooded egg-laying vertebrate distinguished by feathers.', difficulty: 'fácil', explanation: 'Avian biological category capable of self-powered sustained flight.' },
+  { word: 'FISH', category: 'Animals', clue: 'A limbless cold-blooded vertebrate animal with gills living in water.', difficulty: 'fácil', explanation: 'Aquatic vertebrate breathing dissolved oxygen via branchial systems.' },
+  { word: 'MILK', category: 'Foods', clue: 'An opaque white fluid rich in fat and protein secreted by mammals.', difficulty: 'fácil', explanation: 'Primary nutrient dense liquid produced by maternal mammal structures.' },
+  { word: 'BOAT', category: 'Objects', clue: 'A small vessel for traveling over water powered by oars or motor.', difficulty: 'fácil', explanation: 'Hydrodynamic buoyant vehicle displacement for waterborne transport.' },
+  { word: 'BOOK', category: 'Objects', clue: 'A written or printed work consisting of pages glued together.', difficulty: 'fácil', explanation: 'Classic informational storage device bound within protective covers.' },
+  { word: 'STAR', category: 'Nature', clue: 'A luminous point in the night sky that is a large glowing ball of gas.', difficulty: 'fácil', explanation: 'Giant nuclear fusion reaction core suspended in deep cosmic void.' },
+  { word: 'DESK', category: 'Objects', clue: 'A piece of furniture with a flat table-style surface used for working.', difficulty: 'fácil', explanation: 'Workspace furniture designed to optimize cognitive and physical output.' },
+
+  // --- MEDIUM (5 letters) ---
+  { word: 'GREEN', category: 'Nature', clue: 'The color of growing grass and leaves of plants.', difficulty: 'médio', explanation: 'Chromatic wavelength dominant in environments rich in chlorophyll.' },
+  { word: 'HEAVY', category: 'Objects', clue: 'Having great weight or difficult to lift or move.', difficulty: 'médio', explanation: 'Possessing significant mass subjecting the node to gravity force.' },
+  { word: 'PARTY', category: 'Places', clue: 'A social gathering of invited guests for eating, drinking, and dancing.', difficulty: 'médio', explanation: 'Interpersonal gathering celebrating nodes with loud music vibrations.' },
+  { word: 'TASTE', category: 'Foods', clue: 'The sensation of flavor perceived in the mouth and throat on contact.', difficulty: 'médio', explanation: 'Chemical sensor evaluation trigger located in the oral cavity.' },
+  { word: 'POWER', category: 'Mind', clue: 'The capacity or ability to direct or influence the behavior of others.', difficulty: 'médio', explanation: 'Political or structural energy vector indicating top hierarchy.' },
+  { word: 'WORLD', category: 'Nature', clue: 'The earth, together with all of its countries and peoples.', difficulty: 'médio', explanation: 'The global planetary biosystem populated by active human entities.' },
+  { word: 'PLACE', category: 'Places', clue: 'A particular position, point, or area in space.', difficulty: 'médio', explanation: 'Locational geographic coordinates representing spatial occupation.' },
+  { word: 'SHORE', category: 'Nature', clue: 'The land along the edge of a sea, lake, or other large body of water.', difficulty: 'médio', explanation: 'Granular interface segment dividing ocean elements from continental landmass.' },
+  { word: 'CHAIR', category: 'Objects', clue: 'A separate seat for one person, typically with four legs and a back.', difficulty: 'médio', explanation: 'Support furniture item designed to hold weight in a seated posture.' },
+  { word: 'GRAIN', category: 'Foods', clue: 'Wheat or other cultivated cereal crop used as raw food source.', difficulty: 'médio', explanation: 'Starchy endosperm seed component powering human agriculture since ancient times.' },
+
+  // --- HARD (6 letters) ---
+  { word: 'BRONZE', category: 'Objects', clue: 'A yellowish-brown alloy of copper and high percentage of tin.', difficulty: 'difícil', explanation: 'Historic durable alloy marking a key technological epoch of humanity.' },
+  { word: 'TRAVEL', category: 'Places', clue: 'Make a journey, typically of some length or to overseas.', difficulty: 'difícil', explanation: 'Intentional translocation across geological coordinates for tourism.' },
+  { word: 'ABBEYS', category: 'Places', clue: 'The buildings occupied by a community of monks or nuns as shelter.', difficulty: 'difícil', explanation: 'Monastic architectural retreats designed for self-contained devout lifestyle.' },
+  { word: 'FLIGHT', category: 'Tech', clue: 'The action or process of flying through the air using wings/engines.', difficulty: 'difícil', explanation: 'Aerodynamic lift translocation overcoming earth gravitational constant.' },
+  { word: 'BEETLE', category: 'Animals', clue: 'An insect of an order distinguished by forewings modified into hard wing-cases.', difficulty: 'difícil', explanation: 'Coleoptera species possessing chitinous protective elytra structures.' },
+  { word: 'NEEDLE', category: 'Objects', clue: 'A very thin, sharp metal tool used for sewing garments.', difficulty: 'difícil', explanation: 'Surgical or textile piercing instrument designed to direct thread.' },
+  { word: 'YELLOW', category: 'Objects', clue: 'The color between green and orange in the spectrum, like ripe lemons.', difficulty: 'difícil', explanation: 'Bright primary chromatic wavelength resembling sun rays.' },
+  { word: 'SUMMER', category: 'Nature', clue: 'The warmest season of the year, between spring and autumn.', difficulty: 'difícil', explanation: 'The seasonal period marked by highest solar radiation exposure.' },
+  { word: 'FOREST', category: 'Nature', clue: 'A large area covered chiefly with trees, shrubs, and dense undergrowth.', difficulty: 'difícil', explanation: 'A massive biome characterized by high density tree coverage.' },
+  { word: 'VALLEY', category: 'Nature', clue: 'A low area of land between hills or mountains, typically with a river.', difficulty: 'difícil', explanation: 'Depressed topography formed by hydraulic erosion over eras.' },
+  { word: 'SQUARE', category: 'Objects', clue: 'A plane figure with four equal straight sides and four right angles.', difficulty: 'difícil', explanation: 'Regular quadrilateral geometric shape with ninety-degree offsets.' },
+  { word: 'BRIDGE', category: 'Tech', clue: 'A structure carrying a road, path, or railway across an obstacle.', difficulty: 'difícil', explanation: 'Structural engineering asset spanning geological chasms or rivers.' }
+];
+
+export const EXTRA_LARGE_WORDS_PT: LargeWordData[] = [
+  { word: 'BIBLIOTECA', category: 'Locais', clue: 'Espaço que reúne acervos de livros consultáveis e leitura silenciosa.' },
+  { word: 'COMPUTADOR', category: 'Tecnologia', clue: 'Dispositivo eletrônico capaz de realizar computação de alta velocidade.' },
+  { word: 'MICROFONE', category: 'Tecnologia', clue: 'Transdutor eletroacústico que converte som em energia elétrica.' },
+  { word: 'BORBOLETA', category: 'Animais', clue: 'Inseto voador com asas membranosas coloridas e ciclo metamórfico completo.' },
+  { word: 'SINFONIA', category: 'Mente', clue: 'Composição musical complexa dividida em múltiplos movimentos.' },
+  { word: 'TELEFONE', category: 'Tecnologia', clue: 'Aparelho portátil para transmissão vocal a distância por ondas de rádio.' },
+  { word: 'CHOCOLATE', category: 'Alimentos', clue: 'Alimento energético doce feito de sementes torradas de cacau.' },
+  { word: 'CACHORRO', category: 'Animais', clue: 'O melhor e mais fiel mamífero domesticado canídeo amigo do homem.' },
+  { word: 'VENTILADOR', category: 'Objetos', clue: 'Aparelho elétrico rotativo para produzir vento e refrescar ambientes.' },
+  { word: 'ESMERALDA', category: 'Natureza', clue: 'Gema mineral verde preciosa super resistente e lindamente polida.' },
+  { word: 'DINOSSAURO', category: 'Animais', clue: 'Grande réptil pré-histórico extinto que habitava a Terra no Jurássico.' },
+  { word: 'ASTRONAUTA', category: 'Espaço', clue: 'Indivíduo treinado para pilotar ou servir a bordo de espaçonaves.' },
+  { word: 'FOTOGRAFIA', category: 'Tecnologia', clue: 'Processo óptico de registrar e fixar imagens reais sobre superfícies sensíveis.' },
+  { word: 'CONGELADOR', category: 'Alimentos', clue: 'Compartimento de baixa temperatura extrema para guardar comidas.' },
+  { word: 'GEOGRAFIA', category: 'Natureza', clue: 'Estudo da superfície do nosso planeta e suas variações climáticas e físicas.' }
+];
+
+export const EXTRA_LARGE_WORDS_EN: LargeWordData[] = [
+  { word: 'LIBRARY', category: 'Places', clue: 'A building containing collections of books and periodicals for reading.' },
+  { word: 'COMPUTER', category: 'Tech', clue: 'An electronic device designed to store, retrieve, and process rich data.' },
+  { word: 'MICROPHONE', category: 'Tech', clue: 'An acoustic transducer that converts air pressure oscillations into electric sound signals.' },
+  { word: 'BUTTERFLY', category: 'Animals', clue: 'A nectar-feeding insect with two pairs of large, typically brightly colored wings.' },
+  { word: 'SYMPHONY', category: 'Mind', clue: 'An elaborate musical composition for full orchestra in several movements.' },
+  { word: 'TELEPHONE', category: 'Tech', clue: 'A telecommunications device that permits two or more users to conduct a voice call.' },
+  { word: 'CHOCOLATE', category: 'Foods', clue: 'A sweet, brown food preparation of roasted and ground cacao seeds.' },
+  { word: 'SATELLITE', category: 'Space', clue: 'An artificial body placed in orbit around the earth or moon to gather information.' },
+  { word: 'ASTRONAUT', category: 'Space', clue: 'A trained human scientific specialist who travels in a spacecraft beyond earth orbit.' },
+  { word: 'EMERALD', category: 'Nature', clue: 'A precious gemstone of a bright, deep green species of beryl.' },
+  { word: 'DINOSAUR', category: 'Animals', clue: 'A diverse group of extinct reptiles that dominated land during the Mesozoic era.' },
+  { word: 'FREEZER', category: 'Foods', clue: 'An insulated cabinet or compartment kept cold below the freezing point of water.' },
+  { word: 'BACKPACK', category: 'Objects', clue: 'A bag with shoulder straps that is carried on one back.' },
+  { word: 'PHOTOGRAPH', category: 'Tech', clue: 'An image of a real object captured by light on a sensor or chemical film.' },
+  { word: 'GEOGRAPHY', category: 'Nature', clue: 'The systematic scientific study of the earth features and political boundaries.' }
+];
