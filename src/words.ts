@@ -1083,17 +1083,13 @@ export function getWordsByLanguage(lang: 'pt' | 'en' | 'es'): WordData[] {
 }
 
 /**
- * Returns a word data based on configuration.
- * Uses selected difficulty and temperature to select words.
- * - Easy: 4 letters, highly common characters
- * - Medium: 5 letters, standard mixed frequency
- * - Hard: 6 letters, rare characters, complex patterns
+ * Picks a random word of the given length and category, avoiding words used
+ * in the last 24 hours when possible.
  */
 export function generateWordOffline(
   lang: 'pt' | 'en' | 'es',
   category: string,
-  temp: number,
-  difficulty: 'easy' | 'medium' | 'hard' = 'medium'
+  targetLength: number = 5
 ): WordData {
   let usedWordsHistory: string[] = [];
   if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
@@ -1115,9 +1111,6 @@ export function generateWordOffline(
   const dictionary = getWordsByLanguage(lang);
   let candidates = dictionary;
 
-  // Filter based on selected difficulty target word length:
-  // Easy: 4 letters. Medium: 5 letters. Hard: 6 letters.
-  const targetLength = difficulty === 'easy' ? 4 : difficulty === 'medium' ? 5 : 6;
   candidates = dictionary.filter((w) => w.word.length === targetLength);
 
   // Filter by category if specified and valid
