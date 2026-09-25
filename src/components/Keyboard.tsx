@@ -1,5 +1,5 @@
 import React from 'react';
-import { Delete, CornerDownLeft } from 'lucide-react';
+import { Delete } from 'lucide-react';
 import { LetterStatus } from '../types';
 
 interface KeyboardProps {
@@ -30,23 +30,23 @@ export default function Keyboard({
 
   const getKeyClass = (key: string) => {
     // Normal base styling for keyboard actions
-    const base = "h-[38px] sm:h-12 flex-1 rounded text-[11px] sm:text-xs font-black transition-all duration-150 flex items-center justify-center select-none active:scale-95 touch-none ";
+    const base = "h-[38px] sm:h-12 flex-1 rounded text-sm sm:text-xs font-black transition-all duration-150 flex items-center justify-center select-none active:scale-95 touch-none ";
     
     if (key === 'ENTER' || key === 'BACKSPACE') {
-      return base + "bg-[#818384] hover:bg-[#818384]/90 text-white flex-[1.4] text-[9px] sm:text-[10px]";
+      return base + "bg-key hover:bg-key/90 text-white flex-[1.4] text-[11px] sm:text-xs";
     }
 
     const status = letterStatuses[key];
 
     switch (status) {
       case 'correct':
-        return base + "bg-[#538d4e] hover:bg-[#538d4e]/90 text-white";
+        return base + "bg-correct hover:bg-correct/90 text-white";
       case 'present':
-        return base + "bg-[#b59f3b] hover:bg-[#b59f3b]/90 text-white";
+        return base + "bg-present hover:bg-present/90 text-white";
       case 'incorrect':
-        return base + "bg-[#3a3a3c] text-[#818384] cursor-not-allowed border border-[#3a3a3c]";
+        return base + "bg-absent text-absent-fg cursor-not-allowed border border-absent";
       default:
-        return base + "bg-[#818384] hover:bg-[#818384]/90 text-white";
+        return base + "bg-key hover:bg-key/90 text-white";
     }
   };
 
@@ -74,9 +74,8 @@ export default function Keyboard({
                 {key === 'BACKSPACE' ? (
                   <Delete className="w-4 h-4 text-slate-200" />
                 ) : key === 'ENTER' ? (
-                  <span className="flex items-center gap-0.5 font-bold uppercase tracking-wider text-[9px]">
+                  <span className="font-bold uppercase tracking-wide text-[11px] sm:text-xs">
                     {key}
-                    <CornerDownLeft className="w-2.5 h-2.5 text-slate-300" />
                   </span>
                 ) : (
                   key

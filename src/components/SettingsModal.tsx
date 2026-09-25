@@ -51,21 +51,21 @@ export default function SettingsModal({
   };
 
   return (
-    <div id="settings-modal-backdrop" className="absolute inset-0 bg-[#121213]/90 flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+    <div id="settings-modal-backdrop" className="absolute inset-0 bg-app/90 flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
       <div 
         id="settings-modal-content"
-        className="w-full max-w-sm bg-[#1a1a1b] border border-[#3a3a3c] rounded p-6 shadow-xl relative flex flex-col gap-5 select-none"
+        className="w-full max-w-sm bg-surface border border-line rounded p-6 shadow-xl relative flex flex-col gap-5 select-none"
       >
         {/* Close Button */}
         <button 
           onClick={() => { playSound('click'); onClose(); }}
-          className="absolute right-4 top-4 text-[#818384] hover:text-white p-1 rounded hover:bg-[#3a3a3c] transition-colors cursor-pointer"
+          className="absolute right-4 top-4 text-muted hover:text-white p-1 rounded hover:bg-line transition-colors cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Header Title */}
-        <div className="flex items-center gap-2 border-b border-[#3a3a3c] pb-3">
+        <div className="flex items-center gap-2 border-b border-line pb-3">
           <Settings className="w-5 h-5 text-emerald-500" />
           <h2 className="text-sm font-black text-white uppercase tracking-widest">{labelTitle}</h2>
         </div>
@@ -74,20 +74,20 @@ export default function SettingsModal({
         <div className="flex flex-col gap-4 py-1 select-none text-left">
           
           {/* LANGUAGE SELECT */}
-          <div className="flex items-center justify-between border-b border-[#3a3a3c]/40 pb-3">
+          <div className="flex items-center justify-between border-b border-line/40 pb-3">
             <div className="flex flex-col gap-0.5 max-w-[70%]">
               <span className="text-xs font-black text-white uppercase tracking-wider">{labelLang}</span>
-              <span className="text-[10px] text-[#818384]">
+              <span className="text-xs text-muted">
                 {isPt ? 'Muda o dicionário e strings de UI.' : isEs ? 'Cambia el vocabulario y la interfaz.' : 'Toggles vocabulary & UI layout.'}
               </span>
             </div>
-            <div className="flex gap-1.5 bg-[#121213] p-1 rounded border border-[#3a3a3c] font-bold text-xs">
+            <div className="flex gap-1.5 bg-app p-1 rounded border border-line font-bold text-xs">
               <button
                 onClick={() => {
                   playSound('click');
                   setSettings(p => ({ ...p, language: 'pt' }));
                 }}
-                className={`px-3 py-1 rounded transition-colors font-bold uppercase ${settings.language === 'pt' ? 'bg-[#10b981] text-white' : 'text-[#818384] hover:text-white'}`}
+                className={`px-3 py-1 rounded transition-colors font-bold uppercase ${settings.language === 'pt' ? 'bg-emerald-500 text-white' : 'text-muted hover:text-white'}`}
               >
                 PT
               </button>
@@ -96,7 +96,7 @@ export default function SettingsModal({
                   playSound('click');
                   setSettings(p => ({ ...p, language: 'en' }));
                 }}
-                className={`px-3 py-1 rounded transition-colors font-bold uppercase ${settings.language === 'en' ? 'bg-[#10b981] text-white' : 'text-[#818384] hover:text-white'}`}
+                className={`px-3 py-1 rounded transition-colors font-bold uppercase ${settings.language === 'en' ? 'bg-emerald-500 text-white' : 'text-muted hover:text-white'}`}
               >
                 EN
               </button>
@@ -105,7 +105,7 @@ export default function SettingsModal({
                   playSound('click');
                   setSettings(p => ({ ...p, language: 'es' }));
                 }}
-                className={`px-3 py-1 rounded transition-colors font-bold uppercase ${settings.language === 'es' ? 'bg-[#10b981] text-white' : 'text-[#818384] hover:text-white'}`}
+                className={`px-3 py-1 rounded transition-colors font-bold uppercase ${settings.language === 'es' ? 'bg-emerald-500 text-white' : 'text-muted hover:text-white'}`}
               >
                 ES
               </button>
@@ -113,10 +113,10 @@ export default function SettingsModal({
           </div>
 
           {/* AUDIO SOUND EFFECTS */}
-          <div className="flex items-center justify-between border-b border-[#3a3a3c]/40 pb-3">
+          <div className="flex items-center justify-between border-b border-line/40 pb-3">
             <div className="flex flex-col gap-0.5">
               <span className="text-xs font-black text-white uppercase tracking-wider">{labelSound}</span>
-              <span className="text-[10px] text-[#818384]">
+              <span className="text-xs text-muted">
                 {isPt ? 'Ativa sons sintetizados da retro-placa.' : isEs ? 'Activa los efectos de sonido retro digitales.' : 'Plays localized retro digital sound chimes.'}
               </span>
             </div>
@@ -124,8 +124,8 @@ export default function SettingsModal({
               onClick={toggleSound}
               className={`p-1.5 rounded border transition-colors cursor-pointer ${
                 settings.soundEnabled 
-                  ? 'bg-[#121213] border-[#10b981] text-[#10b981] shadow-[0_0_8px_rgba(16,185,129,0.15)]' 
-                  : 'bg-[#121213] border-[#3a3a3c] text-[#818384]'
+                  ? 'bg-app border-emerald-500 text-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.15)]' 
+                  : 'bg-app border-line text-muted'
               }`}
             >
               {settings.soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
@@ -133,10 +133,10 @@ export default function SettingsModal({
           </div>
 
           {/* AUTO CLUE MATCH */}
-          <div className="flex items-center justify-between border-b border-[#3a3a3c]/40 pb-3">
+          <div className="flex items-center justify-between border-b border-line/40 pb-3">
             <div className="flex flex-col gap-0.5 max-w-[75%]">
               <span className="text-xs font-black text-white uppercase tracking-wider">{labelAutoClue}</span>
-              <span className="text-[10px] text-[#818384] leading-normal">{labelAutoClueDesc}</span>
+              <span className="text-xs text-muted leading-normal">{labelAutoClueDesc}</span>
             </div>
             <button
               onClick={() => {
@@ -144,7 +144,7 @@ export default function SettingsModal({
                 setSettings(prev => ({ ...prev, autoRevealClue: !prev.autoRevealClue }));
               }}
               className={`w-10 h-6 rounded-full p-0.5 transition-colors outline-none flex items-center cursor-pointer ${
-                settings.autoRevealClue ? 'bg-[#10b981] justify-end' : 'bg-[#3a3a3c] justify-start'
+                settings.autoRevealClue ? 'bg-emerald-500 justify-end' : 'bg-line justify-start'
               }`}
             >
               <span className="w-4 h-4 rounded-full shadow bg-white" />
@@ -155,7 +155,7 @@ export default function SettingsModal({
           <div className="flex items-center justify-between pb-1">
             <div className="flex flex-col gap-0.5 max-w-[75%]">
               <span className="text-xs font-black text-white uppercase tracking-wider">{labelHardMode}</span>
-              <span className="text-[10px] text-[#818384] leading-normal">
+              <span className="text-xs text-muted leading-normal">
                 {isPt 
                   ? 'Letras reveladas (verdes e amarelas) devem ser usadas nos próximos palpites.' 
                   : isEs 
@@ -169,7 +169,7 @@ export default function SettingsModal({
                 setSettings(prev => ({ ...prev, hardMode: !prev.hardMode }));
               }}
               className={`w-10 h-6 rounded-full p-0.5 transition-colors outline-none flex items-center cursor-pointer ${
-                settings.hardMode ? 'bg-[#10b981] justify-end' : 'bg-[#3a3a3c] justify-start'
+                settings.hardMode ? 'bg-emerald-500 justify-end' : 'bg-line justify-start'
               }`}
             >
               <span className="w-4 h-4 rounded-full shadow bg-white" />

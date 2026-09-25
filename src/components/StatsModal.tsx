@@ -41,67 +41,67 @@ export default function StatsModal({
   const maxBar = Math.max(...stats.guessesDistribution, 1);
 
   return (
-    <div id="stats-modal-backdrop" className="absolute inset-0 bg-[#121213]/90 flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+    <div id="stats-modal-backdrop" className="absolute inset-0 bg-app/90 flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
       <div 
         id="stats-modal-content"
-        className="w-full max-w-sm bg-[#1a1a1b] border border-[#3a3a3c] rounded p-6 shadow-xl relative flex flex-col gap-5 select-none"
+        className="w-full max-w-sm bg-surface border border-line rounded p-4 sm:p-6 shadow-xl relative flex flex-col gap-5 select-none"
       >
         {/* Close button */}
         <button 
           onClick={() => { triggerSound('click'); onClose(); }}
-          className="absolute right-4 top-4 text-[#818384] hover:text-white p-1 rounded hover:bg-[#3a3a3c] transition-colors cursor-pointer"
+          className="absolute right-4 top-4 text-muted hover:text-white p-1 rounded hover:bg-line transition-colors cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Title and Icon */}
-        <div className="flex items-center gap-2 border-b border-[#3a3a3c] pb-3">
+        <div className="flex items-center gap-2 border-b border-line pb-3">
           <BarChart3 className="w-5 h-5 text-emerald-500" />
           <h2 className="text-sm font-black text-white uppercase tracking-widest">{labelTitle}</h2>
         </div>
 
         {/* Numeric KPI Grid */}
         <div className="grid grid-cols-4 gap-2 text-center py-1">
-          <div className="bg-[#121213] p-2.5 rounded border border-[#3a3a3c]">
+          <div className="bg-app px-1 py-2.5 rounded border border-line min-w-0">
             <p className="text-xl font-black text-white font-mono leading-none mb-1">{totalGames}</p>
-            <p className="text-[10px] uppercase font-bold text-[#818384] tracking-tight">{labelPlayed}</p>
+            <p className="text-[11px] sm:text-xs uppercase font-bold text-muted tracking-tight">{labelPlayed}</p>
           </div>
-          <div className="bg-[#121213] p-2.5 rounded border border-[#3a3a3c]">
+          <div className="bg-app px-1 py-2.5 rounded border border-line min-w-0">
             <p className="text-xl font-black text-emerald-500 font-mono leading-none mb-1">{winPercent}%</p>
-            <p className="text-[10px] uppercase font-bold text-[#818384] tracking-tight">{labelWinPct}</p>
+            <p className="text-[11px] sm:text-xs uppercase font-bold text-muted tracking-tight">{labelWinPct}</p>
           </div>
-          <div className="bg-[#121213] p-2.5 rounded border border-[#3a3a3c]">
+          <div className="bg-app px-1 py-2.5 rounded border border-line min-w-0">
             <p className="text-xl font-black text-white font-mono leading-none mb-1 flex items-center justify-center gap-0.5">
               {stats.currentStreak}
             </p>
-            <p className="text-[10px] uppercase font-bold text-[#818384] tracking-tight leading-tight">{labelCurStreak}</p>
+            <p className="text-[11px] sm:text-xs uppercase font-bold text-muted tracking-tight leading-tight">{labelCurStreak}</p>
           </div>
-          <div className="bg-[#121213] p-2.5 rounded border border-[#3a3a3c]">
+          <div className="bg-app px-1 py-2.5 rounded border border-line min-w-0">
             <p className="text-xl font-black text-white font-mono leading-none mb-1 flex items-center justify-center gap-0.5">
               {stats.maxStreak}
             </p>
-            <p className="text-[10px] uppercase font-bold text-[#818384] tracking-tight leading-tight">{labelMaxStreak}</p>
+            <p className="text-[11px] sm:text-xs uppercase font-bold text-muted tracking-tight leading-tight">{labelMaxStreak}</p>
           </div>
         </div>
 
         {/* Distribution Graphs */}
         <div className="flex flex-col gap-2">
-          <h3 className="text-[11px] uppercase tracking-[0.2em] text-[#818384] font-bold">
+          <h3 className="text-sm uppercase tracking-[0.2em] text-muted font-bold">
             {labelDistribution}
           </h3>
-          <div className="space-y-2 mt-1 font-mono text-[10px]">
+          <div className="space-y-2 mt-1 font-mono text-xs">
             {stats.guessesDistribution.map((count, index) => {
               const widthPct = totalGames > 0 ? (count / maxBar) * 100 : 0;
               const hasGuesses = count > 0;
               return (
                 <div key={index} className="flex items-center gap-2">
-                  <span className="w-3 text-right font-black text-[#818384]">{index + 1}</span>
-                  <div className="flex-1 bg-[#121213] h-4 rounded-sm relative border border-[#3a3a3c]/30">
+                  <span className="w-3 text-right font-black text-muted">{index + 1}</span>
+                  <div className="flex-1 bg-app h-4 rounded-sm relative border border-line/30">
                     <div 
-                      className={`absolute left-0 top-0 h-full rounded-sm flex items-center justify-end pr-2 transition-all duration-500 font-black text-white text-[9px] ${
+                      className={`absolute left-0 top-0 h-full rounded-sm flex items-center justify-end pr-2 transition-all duration-500 font-black text-white text-[11px] ${
                         hasGuesses 
-                          ? 'bg-[#10b981] shadow-[0_0_8px_rgba(16,185,129,0.3)]' 
-                          : 'bg-[#3a3a3c]'
+                          ? 'bg-correct' 
+                          : 'bg-line'
                       }`}
                       style={{ width: `${Math.max(widthPct, 8)}%` }}
                     >
@@ -115,7 +115,7 @@ export default function StatsModal({
         </div>
 
         {/* Modal quick options footer */}
-        <div className="flex flex-col sm:flex-row gap-2 mt-2 pt-4 border-t border-[#3a3a3c]">
+        <div className="flex flex-col sm:flex-row gap-2 mt-2 pt-4 border-t border-line">
           {/* Restart / New Game button */}
           <button
             onClick={() => {
@@ -137,7 +137,7 @@ export default function StatsModal({
                 onResetStats();
               }
             }}
-            className="border border-[#3a3a3c] hover:border-rose-500/50 hover:text-rose-500 text-slate-400 py-3 px-3 rounded text-[10px] font-black uppercase tracking-widest text-center transition-colors duration-200 cursor-pointer"
+            className="border border-line hover:border-rose-500/50 hover:text-rose-500 text-slate-400 py-3 px-3 rounded text-xs font-black uppercase tracking-widest text-center transition-colors duration-200 cursor-pointer"
           >
             {labelReset}
           </button>

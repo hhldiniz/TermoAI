@@ -771,16 +771,16 @@ export default function App() {
   return (
     <AndroidFrame>
       {/* Visual Canvas segment */}
-      <div id="game-app-stage" className="flex-1 w-full bg-[#121213] flex flex-col relative select-none pb-[60px] sm:pb-20 justify-between">
+      <div id="game-app-stage" className="flex-1 min-h-0 w-full bg-app flex flex-col relative select-none pb-[60px] sm:pb-20 justify-between">
         
         {/* Navigation / Header segment */}
-        <header className="h-12 sm:h-16 px-3 sm:px-4 flex items-center justify-between border-b border-[#3a3a3c] shrink-0 select-none bg-[#121213] z-20">
+        <header className="h-12 sm:h-16 px-3 sm:px-4 flex items-center justify-between border-b border-line shrink-0 select-none bg-app z-20">
           <div className="flex gap-1 items-center">
             {gameMode !== 'menu' && (
               <button 
                 id="header-btn-home"
                 onClick={() => { triggerSound('click'); setGameMode('menu'); }}
-                className="p-1 px-1.5 text-emerald-400 hover:text-emerald-300 hover:bg-[#3a3a3c] active:scale-95 rounded transition-all mr-1 flex items-center justify-center cursor-pointer"
+                className="p-1 px-1.5 text-emerald-400 hover:text-emerald-300 hover:bg-line active:scale-95 rounded transition-all mr-1 flex items-center justify-center cursor-pointer"
                 title={isPt ? 'Voltar para o Menu' : 'Back to Menu'}
               >
                 <svg className="w-5 h-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -793,7 +793,7 @@ export default function App() {
             <button 
               id="header-btn-help"
               onClick={() => { triggerSound('click'); setIsHelpOpen(true); }}
-              className="p-1 text-slate-400 hover:text-white hover:bg-[#3a3a3c] active:scale-90 rounded transition-all cursor-pointer"
+              className="p-1 text-slate-400 hover:text-white hover:bg-line active:scale-90 rounded transition-all cursor-pointer"
             >
               <HelpCircle className="w-4.5 h-4.5 sm:w-5 sm:h-5 pointer-events-none" />
             </button>
@@ -804,9 +804,9 @@ export default function App() {
                 id="header-btn-refresh"
                 onClick={() => { triggerSound('click'); generateNewWord(); }}
                 disabled={isGenerating}
-                className="p-1 text-slate-400 hover:text-white hover:bg-[#3a3a3c] active:scale-95 disabled:opacity-30 rounded transition-all cursor-pointer"
+                className="p-1 text-slate-400 hover:text-white hover:bg-line active:scale-95 disabled:opacity-30 rounded transition-all cursor-pointer"
               >
-                <RefreshCw className={`w-4 h-4 sm:w-4.5 sm:h-4.5 ${isGenerating ? 'animate-spin text-[#10b981]' : ''} pointer-events-none`} />
+                <RefreshCw className={`w-4 h-4 sm:w-4.5 sm:h-4.5 ${isGenerating ? 'animate-spin text-emerald-500' : ''} pointer-events-none`} />
               </button>
             )}
 
@@ -815,7 +815,7 @@ export default function App() {
               <button 
                 id="header-btn-enigma-refresh"
                 onClick={() => { triggerSound('click'); startEnigmaGame(); }}
-                className="p-1 text-slate-400 hover:text-white hover:bg-[#3a3a3c] active:scale-95 rounded transition-all cursor-pointer"
+                className="p-1 text-slate-400 hover:text-white hover:bg-line active:scale-95 rounded transition-all cursor-pointer"
                 title={isPt ? 'Nova Palavra' : 'New Word'}
               >
                 <RefreshCw className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-emerald-400 pointer-events-none" />
@@ -825,14 +825,14 @@ export default function App() {
 
           {/* Styled Wordle box logo */}
           <div className="flex flex-col items-center select-none" id="termo-box-logo">
-            <span className="hidden sm:inline text-[9px] uppercase tracking-[0.25em] text-emerald-500 font-bold leading-none mb-1 text-center font-mono">
+            <span className="hidden sm:inline text-[11px] uppercase tracking-[0.25em] text-emerald-500 font-bold leading-none mb-1 text-center font-mono">
               {gameMode === 'enigma' 
                 ? (isPt ? 'DESCRIPTOGRAFIA ENIGMA' : 'ENIGMA DECRYPTION') 
                 : gameMode === 'survival'
                   ? (isPt ? 'SOBREVIVÊNCIA 3 VIDAS' : '3 LIVES SURVIVAL')
                   : (isPt ? 'Mecanismo LLM Ativo' : 'Local LLM Active')}
             </span>
-            <span className="inline sm:hidden text-[8px] uppercase tracking-[0.15em] text-emerald-500 font-bold leading-none mb-0.5 text-center font-mono">
+            <span className="inline sm:hidden text-[11px] uppercase tracking-[0.15em] text-emerald-500 font-bold leading-none mb-0.5 text-center font-mono">
               {gameMode === 'enigma' 
                 ? 'ENIGMA' 
                 : gameMode === 'survival' 
@@ -853,7 +853,7 @@ export default function App() {
             <button 
               id="header-btn-stats"
               onClick={() => { triggerSound('click'); setIsStatsOpen(true); }}
-              className="p-1 text-slate-400 hover:text-white hover:bg-[#3a3a3c] active:scale-90 rounded transition-all cursor-pointer"
+              className="p-1 text-slate-400 hover:text-white hover:bg-line active:scale-90 rounded transition-all cursor-pointer"
             >
               <BarChart3 className="w-4.5 h-4.5 sm:w-5 sm:h-5 pointer-events-none" />
             </button>
@@ -862,7 +862,7 @@ export default function App() {
             <button 
               id="header-btn-settings"
               onClick={() => { triggerSound('click'); setIsSettingsOpen(true); }}
-              className="p-1 text-slate-400 hover:text-white hover:bg-[#3a3a3c] active:scale-90 rounded transition-all cursor-pointer"
+              className="p-1 text-slate-400 hover:text-white hover:bg-line active:scale-90 rounded transition-all cursor-pointer"
             >
               <Settings className="w-4.5 h-4.5 sm:w-5 sm:h-5 pointer-events-none" />
             </button>
@@ -879,11 +879,11 @@ export default function App() {
 
         {/* --- GAME MODE SELECTION VIEW --- */}
         {gameMode === 'menu' && (
-          <div className="flex-1 flex flex-col justify-center items-center px-4 py-6 max-w-md mx-auto w-full z-10 select-none text-center">
+          <div className="flex-1 min-h-0 overflow-y-auto flex flex-col justify-center-safe items-center px-4 py-6 max-w-md mx-auto w-full z-10 select-none text-center">
             
             {/* Decorative Tech Icon / Logo */}
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-400 p-[2px] mb-4 shadow-[0_0_20px_rgba(16,185,129,0.3)] flex items-center justify-center animate-pulse">
-              <div className="w-full h-full rounded-2xl bg-[#121213] flex items-center justify-center">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-400 p-[2px] mb-4 shadow-[0_0_20px_rgba(16,185,129,0.3)] flex items-center justify-center">
+              <div className="w-full h-full rounded-2xl bg-app flex items-center justify-center">
                 <Cpu className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-400" />
               </div>
             </div>
@@ -891,7 +891,7 @@ export default function App() {
             <h2 className="text-xl sm:text-3xl font-black tracking-tight text-white mb-1 font-sans">
               TERMO<span className="text-emerald-500">AI</span>
             </h2>
-            <p className="text-[10px] sm:text-xs text-slate-400 mb-6 sm:mb-8 max-w-[280px]">
+            <p className="text-sm text-slate-400 mb-6 sm:mb-8 max-w-[300px]">
               {isPt 
                 ? 'Selecione a arquitetura cognitiva para iniciar o processamento.' 
                 : 'Select the cognitive architecture to begin processing.'}
@@ -906,17 +906,17 @@ export default function App() {
                   setGameMode('standard');
                   pushLog('system', isPt ? 'Arquitetura TermoAI Padrão ativada.' : 'Standard TermoAI computing architecture selected.');
                 }}
-                className="w-full p-3 sm:p-4 rounded-xl bg-[#1a1a1b] border border-[#3a3a3c] hover:border-emerald-500/50 hover:bg-[#202021] text-left transition-all duration-300 active:scale-[0.98] group flex flex-col cursor-pointer"
+                className="w-full p-3 sm:p-4 rounded-xl bg-surface border border-line hover:border-emerald-500/50 hover:bg-surface-2 text-left transition-all duration-300 active:scale-[0.98] group flex flex-col cursor-pointer"
               >
                 <div className="flex items-center justify-between w-full mb-1">
                   <span className="font-extrabold text-xs sm:text-sm text-white group-hover:text-emerald-400 transition-colors">
                     {isPt ? '⚡ TermoAI Padrão' : '⚡ Standard Wordle AI'}
                   </span>
-                  <span className="text-[8px] sm:text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  <span className="text-[11px] sm:text-xs font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                     {isPt ? 'Original' : 'Standard'}
                   </span>
                 </div>
-                <p className="text-[10px] sm:text-xs text-slate-400 leading-snug">
+                <p className="text-[13px] sm:text-sm text-slate-400 leading-snug">
                   {isPt 
                     ? 'Adivinhe palavras com 4, 5 ou 6 letras. Terminal de logs ativa, logs LLM locais de amostragem e hyperparâmetros.'
                     : 'Guess words with 4, 5, or 6 letters. Log terminal active, local sampling weights and hyperparameters simulation.'}
@@ -928,17 +928,17 @@ export default function App() {
                 onClick={() => {
                   startEnigmaGame();
                 }}
-                className="w-full p-3 sm:p-4 rounded-xl bg-[#1a1a1b] border border-[#3a3a3c] hover:border-emerald-500/50 hover:bg-[#202021] text-left transition-all duration-300 active:scale-[0.98] group flex flex-col cursor-pointer"
+                className="w-full p-3 sm:p-4 rounded-xl bg-surface border border-line hover:border-emerald-500/50 hover:bg-surface-2 text-left transition-all duration-300 active:scale-[0.98] group flex flex-col cursor-pointer"
               >
                 <div className="flex items-center justify-between w-full mb-1">
                   <span className="font-extrabold text-xs sm:text-sm text-white group-hover:text-emerald-400 transition-colors">
                     {isPt ? '🔎 Decodificador Enigma' : '🔎 Enigma Decoder'}
                   </span>
-                  <span className="text-[8px] sm:text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  <span className="text-[11px] sm:text-xs font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                     {isPt ? 'Dica Redutiva' : 'Penalty Score'}
                   </span>
                 </div>
-                <p className="text-[10px] sm:text-xs text-slate-400 leading-snug">
+                <p className="text-[13px] sm:text-sm text-slate-400 leading-snug">
                   {isPt 
                     ? 'Palavras médias (5 a 8 letras) escondidas. Peça letras de dica que aparecem na palavra mas reduzem seu escore final!'
                     : 'Medium hidden words (5 to 8 letters). Ask for correct letters that appear everywhere but reduce your final score!'}
@@ -950,18 +950,18 @@ export default function App() {
                 onClick={() => {
                   startSurvivalGame();
                 }}
-                className="w-full p-3 sm:p-4 rounded-xl bg-[#1a1a1b] border border-[#3a3a3c] hover:border-rose-500/50 hover:bg-[#202021] text-left transition-all duration-300 active:scale-[0.98] group flex flex-col cursor-pointer"
+                className="w-full p-3 sm:p-4 rounded-xl bg-surface border border-line hover:border-rose-500/50 hover:bg-surface-2 text-left transition-all duration-300 active:scale-[0.98] group flex flex-col cursor-pointer"
               >
                 <div className="flex items-center justify-between w-full mb-1">
-                  <span className="font-extrabold text-xs sm:text-sm text-white group-hover:text-[#f43f5e] transition-colors flex items-center gap-1.5">
-                    <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500 animate-pulse shrink-0" />
+                  <span className="font-extrabold text-xs sm:text-sm text-white group-hover:text-rose-500 transition-colors flex items-center gap-1.5">
+                    <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500 shrink-0" />
                     {isPt ? 'Modo Sobrevivência' : 'Survival Mode'}
                   </span>
-                  <span className="text-[8px] sm:text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                  <span className="text-[11px] sm:text-xs font-mono px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">
                     {isPt ? '3 Vidas' : '3 Lives'}
                   </span>
                 </div>
-                <p className="text-[10px] sm:text-xs text-slate-400 leading-snug">
+                <p className="text-[13px] sm:text-sm text-slate-400 leading-snug">
                   {isPt 
                     ? 'Acerte palavras seguidas em série. Você começa com 3 vidas e perde uma vida a cada palpite incorreto!'
                     : 'Solve consecutive secrets in a row. Start with 3 lives and lose a life on every wrong full word guess!'}
@@ -970,7 +970,7 @@ export default function App() {
             </div>
 
             {/* Language indicator on the fly */}
-            <div className="mt-6 sm:mt-8 flex gap-2 items-center text-[10px] sm:text-xs text-slate-500 bg-[#1a1a1b] py-1.5 px-3 rounded-full border border-[#3a3a3c]">
+            <div className="mt-6 sm:mt-8 flex gap-2 items-center text-xs text-slate-500 bg-surface py-1.5 px-3 rounded-full border border-line">
               <span>{isPt ? 'Idioma:' : isEs ? 'Idioma:' : 'Language:'}</span>
               <button 
                 onClick={() => {
@@ -996,18 +996,18 @@ export default function App() {
             {/* Dynamic Clues & Status Card above play board */}
             <div className="px-4 mt-0.5 sm:mt-2 flex flex-col gap-1 sm:gap-2 relative z-10 shrink-0 select-none text-center">
               {activeWord ? (
-                <div className="bg-[#1a1a1b] p-1.5 sm:p-3 rounded border border-[#3a3a3c] flex flex-col items-center justify-center text-xs max-w-xs mx-auto w-full relative">
+                <div className="bg-surface p-1.5 sm:p-3 rounded border border-line flex flex-col items-center justify-center text-xs max-w-xs mx-auto w-full relative">
                   {/* Category indicator badges */}
                   <div className="flex gap-2 items-center mb-0.5 sm:mb-1">
-                    <span className="text-[9px] sm:text-[10px] font-bold text-emerald-500 uppercase tracking-widest">
+                    <span className="text-[11px] sm:text-xs font-bold text-emerald-500 uppercase tracking-widest">
                       {isPt ? 'Categoria:' : 'Category:'} {isPt && activeWord.category === 'Nature' ? 'Natureza' : activeWord.category}
                     </span>
-                    <span className={`text-[8px] sm:text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider border ${
+                    <span className={`text-[11px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider border ${
                       activeWord.difficulty === 'fácil' 
-                        ? 'bg-[#1a1a1b] border-emerald-500/30 text-emerald-400' 
+                        ? 'bg-surface border-emerald-500/30 text-emerald-400' 
                         : activeWord.difficulty === 'médio'
-                          ? 'bg-[#1a1a1b] border-amber-500/30 text-amber-500' 
-                          : 'bg-[#1a1a1b] border-rose-500/30 text-rose-400'
+                          ? 'bg-surface border-amber-500/30 text-amber-500' 
+                          : 'bg-surface border-rose-500/30 text-rose-400'
                     }`}>
                       {activeWord.difficulty}
                     </span>
@@ -1015,8 +1015,8 @@ export default function App() {
 
                   {/* Clue revealing or solved text */}
                   {revealedCount > 0 ? (
-                    <p className="text-[10px] sm:text-[11px] text-slate-100 font-bold leading-snug mt-0.5 sm:mt-1 animate-in fade-in slide-in-from-top-1 px-1.5 animate-bounce">
-                      <span className="font-extrabold text-emerald-500 not-italic uppercase tracking-widest block text-[8px] sm:text-[9px] mb-0">{isPt ? '⚡ Dica Lógica:' : isEs ? '⚡ Pista Lógica:' : '⚡ AI Hint:'}</span>
+                    <p className="text-[13px] sm:text-sm text-slate-100 font-bold leading-snug mt-0.5 sm:mt-1 animate-in fade-in slide-in-from-top-1 px-1.5">
+                      <span className="font-extrabold text-emerald-500 not-italic uppercase tracking-widest block text-[11px] mb-0">{isPt ? '⚡ Dica Lógica:' : isEs ? '⚡ Pista Lógica:' : '⚡ AI Hint:'}</span>
                       "{activeWord.clue}"
                     </p>
                   ) : (
@@ -1027,7 +1027,7 @@ export default function App() {
                         setRevealedCount(1);
                         pushLog('info', isPt ? 'Clue consultado pelo Oracle.' : isEs ? 'Pista consultada al Oráculo de IA.' : 'Clue queried by user.');
                       }}
-                      className="mt-1 flex items-center gap-1.5 text-[9px] sm:text-[10px] bg-white text-black hover:bg-emerald-500 hover:text-white font-black uppercase tracking-widest py-1 px-2.5 sm:py-1.5 sm:px-3 rounded transition-colors active:scale-95 cursor-pointer"
+                      className="mt-1 flex items-center gap-1.5 text-[11px] sm:text-xs bg-white text-black hover:bg-emerald-500 hover:text-white font-black uppercase tracking-widest py-1 px-2.5 sm:py-1.5 sm:px-3 rounded transition-colors active:scale-95 cursor-pointer"
                     >
                       <Cpu className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                       {isPt ? 'Consultar Oracle LLM' : isEs ? 'Consultar Oráculo LLM' : 'Consult Local LLM Oracle'}
@@ -1036,7 +1036,7 @@ export default function App() {
 
                   {/* Solved reveal message */}
                   {gameStatus !== 'playing' && (
-                    <div className="absolute inset-0 bg-[#1a1a1b] rounded flex flex-col items-center justify-center px-4 py-2 border border-[#3a3a3c] animate-in fade-in zoom-in-95 duration-200 z-10">
+                    <div className="absolute inset-0 bg-surface rounded flex flex-col items-center justify-center px-4 py-2 border border-line animate-in fade-in zoom-in-95 duration-200 z-10">
                       <p className={`text-xs font-black tracking-widest uppercase ${gameStatus === 'won' ? 'text-emerald-500' : 'text-rose-500'}`}>
                         {gameStatus === 'won' ? (isPt ? 'Vitória! 🎉' : isEs ? '¡Victoria! 🎉' : 'Victory Resolved! 🎉') : (isPt ? 'Derrota! 💀' : isEs ? '¡Derrota! 💀' : 'Defeated! 💀')}
                       </p>
@@ -1045,7 +1045,7 @@ export default function App() {
                       </h3>
                       <button 
                         onClick={() => { triggerSound('click'); generateNewWord(); }}
-                        className="mt-2 bg-white text-black hover:bg-emerald-500 hover:text-white font-black text-[10px] uppercase tracking-widest py-1.5 px-4 rounded transition-colors active:scale-95 cursor-pointer"
+                        className="mt-2 bg-white text-black hover:bg-emerald-500 hover:text-white font-black text-xs uppercase tracking-widest py-1.5 px-4 rounded transition-colors active:scale-95 cursor-pointer"
                       >
                         {isPt ? 'Próxima Palavra' : isEs ? 'Siguiente Palabra' : 'Next Puzzle'}
                       </button>
@@ -1053,7 +1053,7 @@ export default function App() {
                   )}
                 </div>
               ) : (
-                <div className="h-14 flex items-center justify-center font-mono text-xs text-[#818384] select-none gap-2">
+                <div className="h-14 flex items-center justify-center font-mono text-xs text-muted select-none gap-2">
                   <RefreshCw className="w-4 h-4 animate-spin text-emerald-500" />
                   <span>{isPt ? 'Gerando palavra...' : isEs ? 'Generando palabra...' : 'Sampling local token weights...'}</span>
                 </div>
@@ -1077,17 +1077,17 @@ export default function App() {
           <>
             {/* Category / Clue Concept Indicator */}
             <div className="px-4 mt-0.5 sm:mt-2 flex flex-col gap-1 sm:gap-2 relative z-10 shrink-0 select-none text-center max-w-md mx-auto w-full animate-in fade-in slide-in-from-top-2 duration-300">
-              <div className="bg-[#1a1a1b] p-2 sm:p-3 rounded border border-[#3a3a3c] flex flex-col items-center justify-center text-xs relative w-full">
-                <div className="flex gap-2 items-center mb-1">
-                  <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest font-mono">
+              <div className="bg-surface p-2 sm:p-3 rounded border border-line flex flex-col items-center justify-center text-xs relative w-full">
+                <div className="flex flex-wrap justify-center gap-x-2 gap-y-1 items-center mb-1">
+                  <span className="text-xs font-bold text-emerald-500 uppercase tracking-widest font-mono">
                     {isPt ? 'Categoria:' : 'Category:'} {isPt && enigmaWord.category === 'Nature' ? 'Natureza' : enigmaWord.category}
                   </span>
-                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase tracking-wider font-mono">
+                  <span className="whitespace-nowrap text-[11px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase tracking-wider font-mono">
                     {isPt ? 'Conversão Enigma' : 'Enigma Conversion'}
                   </span>
                 </div>
-                <p className="text-[10px] sm:text-[11px] text-slate-100 font-bold leading-normal px-2">
-                  <span className="font-extrabold text-emerald-500 uppercase tracking-widest block text-[8px] sm:text-[9px] mb-0.5">
+                <p className="text-[13px] sm:text-sm text-slate-100 font-bold leading-normal px-2">
+                  <span className="font-extrabold text-emerald-500 uppercase tracking-widest block text-[11px] mb-0.5">
                     {isPt ? '⚡ Diretriz do Clue:' : '⚡ Concept Prompt:'}
                   </span>
                   "{enigmaWord.clue}"
@@ -1108,11 +1108,11 @@ export default function App() {
                       className={`w-7 h-9 sm:w-9 sm:h-11 flex items-center justify-center text-sm sm:text-base font-black rounded border-2 transition-all duration-300 ${
                         isRevealed
                           ? isSolvedWord
-                            ? 'bg-[#538d4e] border-[#538d4e] text-white animate-in zoom-in duration-300'
+                            ? 'bg-correct border-correct text-white animate-in zoom-in duration-300'
                             : enigmaRevealedLetters.includes(char)
-                              ? 'bg-[#1b4332] border-emerald-500 text-emerald-400'
+                              ? 'bg-hint border-emerald-500 text-emerald-400'
                               : 'bg-rose-950 border-rose-600 text-rose-200'
-                          : 'bg-[#1a1a1b] border-[#3a3a3c] text-slate-700'
+                          : 'bg-surface border-line text-slate-700'
                       }`}
                     >
                       {isRevealed ? char : '?'}
@@ -1123,34 +1123,34 @@ export default function App() {
 
               {/* Score HUD telemetry */}
               <div className="mt-3 sm:mt-4 flex flex-col items-center w-full max-w-xs gap-1">
-                <div className="flex justify-between w-full text-[10px] uppercase font-bold tracking-wider px-1">
+                <div className="flex justify-between w-full text-xs uppercase font-bold tracking-wider px-1">
                   <span className="text-slate-400 font-mono">{isPt ? 'Tempo Restante:' : 'Time Remaining:'}</span>
                   <span className={`font-mono font-black transition-colors duration-300 ${
                     enigmaTimeLeft < 30 
                       ? 'text-rose-500 animate-pulse text-xs sm:text-sm font-extrabold' 
                       : enigmaTimeLeft < 60 
-                        ? 'text-amber-500 animate-pulse' 
+                        ? 'text-amber-500' 
                         : 'text-emerald-400'
                   }`}>
                     {Math.floor(enigmaTimeLeft / 60)}:{(enigmaTimeLeft % 60).toString().padStart(2, '0')}
                   </span>
                 </div>
 
-                <div className="flex justify-between w-full text-[10px] uppercase font-bold tracking-wider mb-1 px-1">
+                <div className="flex justify-between w-full text-xs uppercase font-bold tracking-wider mb-1 px-1">
                   <span className="text-slate-400 font-mono">{isPt ? 'Escore Final Estimado:' : 'Estimated Final Score:'}</span>
-                  <span className={enigmaScore > 40 ? 'text-emerald-400 font-black animate-pulse font-mono' : 'text-rose-500 font-black animate-bounce font-mono'}>
+                  <span className={enigmaScore > 40 ? 'text-emerald-400 font-black font-mono' : 'text-rose-500 font-black font-mono'}>
                     {enigmaScore} pts
                   </span>
                 </div>
                 {/* Progress bar */}
-                <div className="w-full h-1.5 bg-[#202021] rounded-full overflow-hidden border border-[#3a3a3c]">
+                <div className="w-full h-1.5 bg-surface-2 rounded-full overflow-hidden border border-line">
                   <div 
                     className={`h-full transition-all duration-500 rounded-full ${
                       enigmaScore > 50 
                         ? 'bg-gradient-to-r from-emerald-500 to-teal-400' 
                         : enigmaScore > 20 
                           ? 'bg-amber-500' 
-                          : 'bg-rose-600 animate-pulse'
+                          : 'bg-rose-600'
                     }`}
                     style={{ width: `${Math.max(0, Math.min(100, enigmaScore))}%` }}
                   />
@@ -1178,7 +1178,7 @@ export default function App() {
                         }
                       }}
                       disabled={enigmaScore <= 15}
-                      className="w-full h-9 flex items-center justify-center gap-1.5 bg-[#1a1a1b] text-[10px] sm:text-xs text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/10 disabled:opacity-40 rounded py-2 transition-all font-black uppercase cursor-pointer"
+                      className="w-full h-9 flex items-center justify-center gap-1.5 bg-surface text-xs text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/10 disabled:opacity-40 rounded py-2 transition-all font-black uppercase cursor-pointer"
                     >
                       <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
                       {isPt ? 'Pedir Letra Dica (-15)' : 'Request Letter Hint (-15)'}
@@ -1186,7 +1186,7 @@ export default function App() {
                   ) : (
                     <button
                       onClick={startEnigmaGame}
-                      className="w-full h-9 flex items-center justify-center gap-1.5 bg-emerald-500 hover:bg-emerald-400 text-white rounded py-2 font-black uppercase text-[10px] sm:text-xs transition-colors cursor-pointer"
+                      className="w-full h-9 flex items-center justify-center gap-1.5 bg-emerald-500 hover:bg-emerald-400 text-white rounded py-2 font-black uppercase text-xs transition-colors cursor-pointer"
                     >
                       <RefreshCw className="w-4 h-4" />
                       {isPt ? 'Jogar de Novo' : 'Decrypt New Word'}
@@ -1194,7 +1194,7 @@ export default function App() {
                   )}
 
                   {enigmaMessage && (
-                    <div className="text-[10px] sm:text-[11px] py-1 px-3 rounded bg-rose-950/40 border border-rose-500/20 text-rose-400 text-center animate-bounce mt-1 font-bold font-mono">
+                    <div className="text-xs sm:text-sm py-1 px-3 rounded bg-rose-950/40 border border-rose-500/20 text-rose-400 text-center animate-shake mt-1 font-bold font-mono">
                       {enigmaMessage}
                     </div>
                   )}
@@ -1205,10 +1205,10 @@ export default function App() {
             {/* Draft / answer typing bar */}
             {enigmaStatus === 'playing' ? (
               <div className="w-full max-w-sm px-4 mb-2 flex flex-col gap-1 items-stretch mx-auto select-none">
-                <div className="text-[9px] uppercase tracking-widest text-[#10b981] font-bold text-left mb-0.5 ml-1 font-mono">
+                <div className="text-[11px] uppercase tracking-widest text-emerald-500 font-bold text-left mb-0.5 ml-1 font-mono">
                   {isPt ? 'Digite seu palpite completo:' : 'Draft full word answer:'}
                 </div>
-                <div className="relative flex items-center bg-[#1a1a1b] rounded-lg border border-[#3a3a3c] focus-within:border-emerald-500 shadow-inner px-2.5 py-1.5 min-h-[36px] sm:min-h-[40px]">
+                <div className="relative flex items-center bg-surface rounded-lg border border-line focus-within:border-emerald-500 shadow-inner px-2.5 py-1.5 min-h-[36px] sm:min-h-[40px]">
                   <span className="text-emerald-500 font-mono font-black text-xs sm:text-sm mr-2 select-none">{'>'}</span>
                   <input
                     type="text"
@@ -1229,7 +1229,7 @@ export default function App() {
                   {enigmaInput.length > 0 && (
                     <button
                       onClick={submitEnigmaFullGuess}
-                      className="ml-2 px-2.5 py-1 text-[10px] bg-emerald-500 text-white font-black hover:bg-emerald-400 uppercase tracking-wider rounded transition-colors active:scale-95 cursor-pointer"
+                      className="ml-2 px-2.5 py-1 text-xs bg-emerald-500 text-white font-black hover:bg-emerald-400 uppercase tracking-wider rounded transition-colors active:scale-95 cursor-pointer"
                     >
                       {isPt ? 'Confirmar' : 'Confirm'}
                     </button>
@@ -1245,14 +1245,14 @@ export default function App() {
                 }`}>
                   {enigmaStatus === 'won' ? (
                     <div>
-                      <span className="block text-[9px] uppercase tracking-widest text-emerald-400 font-extrabold mb-1 font-mono">🎉 {isPt ? 'DESAFIO CONCLUÍDO!' : 'DECRYPTED SUCCESS!'}</span>
+                      <span className="block text-[11px] uppercase tracking-widest text-emerald-400 font-extrabold mb-1 font-mono">🎉 {isPt ? 'DESAFIO CONCLUÍDO!' : 'DECRYPTED SUCCESS!'}</span>
                       {isPt 
                         ? `Você desvendou a palavra secreta com ${enigmaScore} pontos!` 
                         : `You decrypted the secret word successfully claiming ${enigmaScore} points!`}
                     </div>
                   ) : (
                     <div>
-                      <span className="block text-[9px] uppercase tracking-widest text-rose-400 font-extrabold mb-1 font-mono">💥 {isPt ? 'SINAL PERDIDO' : 'DECRYPTION FAILED'}</span>
+                      <span className="block text-[11px] uppercase tracking-widest text-rose-400 font-extrabold mb-1 font-mono">💥 {isPt ? 'SINAL PERDIDO' : 'DECRYPTION FAILED'}</span>
                       {isPt 
                         ? `A palavra encriptada era ${enigmaWord.word}` 
                         : `The encrypted secret word was ${enigmaWord.word}`}
@@ -1269,9 +1269,9 @@ export default function App() {
           <>
             {/* Category / Clue Concept Indicator */}
             <div className="px-4 mt-0.5 sm:mt-2 flex flex-col gap-1 sm:gap-2 relative z-10 shrink-0 select-none text-center max-w-md mx-auto w-full animate-in fade-in slide-in-from-top-2 duration-300">
-              <div className="bg-[#1a1a1b] p-2 sm:p-3 rounded border border-rose-500/20 flex flex-col items-center justify-center text-xs relative w-full">
-                <div className="flex gap-2 items-center mb-1">
-                  <span className="text-[10px] font-bold text-rose-400 uppercase tracking-widest font-mono">
+              <div className="bg-surface p-2 sm:p-3 rounded border border-rose-500/20 flex flex-col items-center justify-center text-xs relative w-full">
+                <div className="flex flex-wrap justify-center gap-x-2 gap-y-1 items-center mb-1">
+                  <span className="text-xs font-bold text-rose-400 uppercase tracking-widest font-mono">
                     {isPt ? 'Categoria:' : 'Category:'} {isPt && survivalWord.category === 'Nature' ? 'Natureza' : survivalWord.category}
                   </span>
                   <motion.span
@@ -1288,17 +1288,17 @@ export default function App() {
                       ]
                     } : {}}
                     transition={{ duration: 0.6, ease: "easeOut" }}
-                    className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 uppercase tracking-wider font-mono flex items-center gap-1 relative overflow-visible"
+                    className="text-[11px] font-bold px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 uppercase tracking-wider font-mono flex items-center gap-1 relative overflow-visible"
                   >
-                    <Trophy className={`w-3 h-3 transition-colors duration-300 ${survivalStreak >= 3 ? 'text-amber-400 animate-bounce' : 'text-rose-400'}`} />
+                    <Trophy className={`w-3 h-3 transition-colors duration-300 ${survivalStreak >= 3 ? 'text-amber-400' : 'text-rose-400'}`} />
                     <span>{isPt ? `${survivalStreak} Acertos` : `${survivalStreak} Solved`}</span>
 
                     {/* Subtle Fire 'On Fire' Indicator if streak >= 3 */}
                     {survivalStreak >= 3 && (
                       <motion.span
                         animate={{ scale: [1, 1.2, 1], y: [0, -1, 0] }}
-                        transition={{ repeat: Infinity, duration: 1.2, ease: "easeInOut" }}
-                        className="text-[10px] select-none text-orange-500 ml-0.5"
+                        transition={{ duration: 0.6, ease: "easeOut" }}
+                        className="text-xs select-none text-orange-500 ml-0.5"
                       >
                         🔥
                       </motion.span>
@@ -1353,8 +1353,8 @@ export default function App() {
                     </AnimatePresence>
                   </motion.span>
                 </div>
-                <p className="text-[10px] sm:text-[11px] text-slate-100 font-bold leading-normal px-2">
-                  <span className="font-extrabold text-rose-400 uppercase tracking-widest block text-[8px] sm:text-[9px] mb-0.5">
+                <p className="text-[13px] sm:text-sm text-slate-100 font-bold leading-normal px-2">
+                  <span className="font-extrabold text-rose-400 uppercase tracking-widest block text-[11px] mb-0.5">
                     {isPt ? '⚡ Diretriz do Clue:' : '⚡ Concept Prompt:'}
                   </span>
                   "{survivalWord.clue}"
@@ -1373,7 +1373,7 @@ export default function App() {
                       key={idx} 
                       className={`w-6 h-6 transition-all duration-300 ${
                         isHeartActive 
-                          ? 'text-rose-500 fill-rose-500 scale-100 animate-pulse' 
+                          ? 'text-rose-500 fill-rose-500 scale-100' 
                           : 'text-zinc-700 fill-zinc-800 scale-90 opacity-40'
                       }`}
                     />
@@ -1392,11 +1392,11 @@ export default function App() {
                       className={`w-7 h-9 sm:w-9 sm:h-11 flex items-center justify-center text-sm sm:text-base font-black rounded border-2 transition-all duration-300 ${
                         isRevealed
                           ? isSolvedWord
-                            ? 'bg-[#538d4e] border-[#538d4e] text-white animate-in zoom-in duration-300'
+                            ? 'bg-correct border-correct text-white animate-in zoom-in duration-300'
                             : survivalRevealedLetters.includes(char)
-                              ? 'bg-[#1b4332] border-emerald-500 text-emerald-400'
+                              ? 'bg-hint border-emerald-500 text-emerald-400'
                               : 'bg-rose-950 border-rose-600 text-rose-200'
-                          : 'bg-[#1a1a1b] border-[#3a3a3c] text-slate-700'
+                          : 'bg-surface border-line text-slate-700'
                       }`}
                     >
                       {isRevealed ? char : '?'}
@@ -1409,29 +1409,29 @@ export default function App() {
               <div className="w-full flex flex-col gap-1.5 mt-3 sm:mt-4 max-w-xs mx-auto">
                 {isSurvivalTransitioning && (
                   <div className="w-full mt-1 mb-2">
-                    <div className="flex justify-between items-center text-[9px] font-mono font-extrabold text-[#f43f5e] mb-1 tracking-widest uppercase">
+                    <div className="flex justify-between items-center text-[11px] font-mono font-extrabold text-rose-500 mb-1 tracking-widest uppercase">
                       <span>{isPt ? 'PRÓXIMA PALAVRA EM...' : 'NEXT WORD IN...'}</span>
                       <motion.span
                         animate={{ rotate: 360 }}
                         transition={{ repeat: Infinity, duration: 2.5, ease: "linear" }}
-                        className="inline-block text-[11px]"
+                        className="inline-block text-sm"
                       >
                         ⏳
                       </motion.span>
                     </div>
-                    <div className="w-full h-2.5 bg-[#1a1a1b] border border-[#3a3a3c] rounded-full overflow-hidden relative">
+                    <div className="w-full h-2.5 bg-surface border border-line rounded-full overflow-hidden relative">
                       <motion.div
                         initial={{ width: "100%" }}
                         animate={{ width: "0%" }}
                         transition={{ duration: 2.5, ease: "linear" }}
-                        className="h-full bg-gradient-to-r from-[#f43f5e] via-orange-500 to-yellow-400 rounded-full"
+                        className="h-full bg-gradient-to-r from-rose-500 via-orange-500 to-yellow-400 rounded-full"
                       />
                     </div>
                   </div>
                 )}
 
                 {survivalMessage && (
-                  <div className="text-[10px] sm:text-[11px] py-1.5 px-3 rounded bg-rose-950/40 border border-rose-500/20 text-rose-400 text-center animate-bounce mt-1 font-bold font-mono">
+                  <div className="text-xs sm:text-sm py-1.5 px-3 rounded bg-rose-950/40 border border-rose-500/20 text-rose-400 text-center animate-shake mt-1 font-bold font-mono">
                     {survivalMessage}
                   </div>
                 )}
@@ -1441,10 +1441,10 @@ export default function App() {
             {/* Draft / answer typing bar */}
             {survivalStatus === 'playing' ? (
               <div className="w-full max-w-sm px-4 mb-2 flex flex-col gap-1 items-stretch mx-auto select-none">
-                <div className="text-[9px] uppercase tracking-widest text-[#f43f5e] font-bold text-left mb-0.5 ml-1 font-mono">
+                <div className="text-[11px] uppercase tracking-widest text-rose-500 font-bold text-left mb-0.5 ml-1 font-mono">
                   {isPt ? 'Sua Resposta Completa / Letras:' : 'Your Complete Word Prediction:'}
                 </div>
-                <div className="relative flex items-center bg-[#1a1a1b] rounded-lg border border-[#3a3a3c] focus-within:border-rose-500 shadow-inner px-2.5 py-1.5 min-h-[36px] sm:min-h-[40px]">
+                <div className="relative flex items-center bg-surface rounded-lg border border-line focus-within:border-rose-500 shadow-inner px-2.5 py-1.5 min-h-[36px] sm:min-h-[40px]">
                   <span className="text-rose-500 font-mono font-black text-xs sm:text-sm mr-2 select-none">{'>'}</span>
                   <input
                     type="text"
@@ -1465,7 +1465,7 @@ export default function App() {
                   {survivalInput.length > 0 && (
                     <button
                       onClick={submitSurvivalFullGuess}
-                      className="ml-2 px-2.5 py-1 text-[10px] bg-rose-500 text-white font-black hover:bg-rose-400 uppercase tracking-wider rounded transition-colors active:scale-95 cursor-pointer"
+                      className="ml-2 px-2.5 py-1 text-xs bg-rose-500 text-white font-black hover:bg-rose-400 uppercase tracking-wider rounded transition-colors active:scale-95 cursor-pointer"
                     >
                       {isPt ? 'Confirmar' : 'Confirm'}
                     </button>
@@ -1476,25 +1476,25 @@ export default function App() {
               <div className="w-full max-w-sm px-4 mb-2 text-center mx-auto animate-in zoom-in-95 duration-200">
                 <div className={`p-2.5 sm:p-3 rounded-lg border text-xs sm:text-sm font-bold ${
                   survivalStatus === 'won' 
-                    ? 'bg-[#1b4332] border-emerald-500 text-emerald-300' 
+                    ? 'bg-hint border-emerald-500 text-emerald-300' 
                     : 'bg-rose-950/40 border-rose-500/40 text-rose-300'
                 }`}>
                   {survivalStatus === 'won' ? (
                     <div>
-                      <span className="block text-[9px] uppercase tracking-widest text-emerald-450 font-extrabold mb-1 font-mono">🎉 {isPt ? 'ACERTO CONCLUÍDO!' : 'CORRECT ANSWER!'}</span>
+                      <span className="block text-[11px] uppercase tracking-widest text-emerald-450 font-extrabold mb-1 font-mono">🎉 {isPt ? 'ACERTO CONCLUÍDO!' : 'CORRECT ANSWER!'}</span>
                       {isPt 
                         ? `Aguarde, carregando nova palavra secreta...` 
                         : `Wait, loading the next secret word...`}
                     </div>
                   ) : (
                     <div>
-                      <span className="block text-[9px] uppercase tracking-widest text-rose-450 font-extrabold mb-1 font-mono">☠️ {isPt ? 'FIM DE JOGO!' : 'GAME OVER!'}</span>
+                      <span className="block text-[11px] uppercase tracking-widest text-rose-450 font-extrabold mb-1 font-mono">☠️ {isPt ? 'FIM DE JOGO!' : 'GAME OVER!'}</span>
                       {isPt 
                         ? `Você acertou ${survivalStreak} palavras seguidas! A última palavra era: ${survivalWord.word}` 
                         : `You solved ${survivalStreak} words in a row! The final word was: ${survivalWord.word}`}
                       <button
                         onClick={startSurvivalGame}
-                        className="mt-2.5 w-full py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded font-black uppercase text-[9px] sm:text-[10px] transition-colors cursor-pointer block text-center"
+                        className="mt-2.5 w-full py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded font-black uppercase text-[11px] sm:text-xs transition-colors cursor-pointer block text-center"
                       >
                         {isPt ? 'Tentar Novamente' : 'Try Again'}
                       </button>

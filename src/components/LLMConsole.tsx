@@ -131,7 +131,7 @@ export default function LLMConsole({
     <div id="llm-console-container" className="absolute bottom-1.5 sm:bottom-6 left-0 right-0 px-4 z-40">
       {/* Slide-up Console sheet wrapper */}
       <div 
-        className={`bg-[#1a1a1b] border-t border-l border-r ${isOpen ? 'border-[#3a3a3c] shadow-lg' : 'border-[#3a3a3c]/70 shadow-md'} rounded-t transition-all duration-300 flex flex-col`}
+        className={`bg-surface border-t border-l border-r ${isOpen ? 'border-line shadow-lg' : 'border-line/70 shadow-md'} rounded-t transition-all duration-300 flex flex-col`}
         style={{ height: isOpen ? 'min(85vh, 380px)' : 'var(--console-closed-h)' }}
       >
         {/* Upper trigger bar */}
@@ -140,16 +140,16 @@ export default function LLMConsole({
             triggerSound('click');
             setIsOpen(!isOpen);
           }}
-          className="h-[var(--console-closed-h)] px-4 flex items-center justify-between cursor-pointer select-none active:bg-[#3a3a3c]/30 rounded-t shrink-0"
+          className="h-[var(--console-closed-h)] px-4 flex items-center justify-between cursor-pointer select-none active:bg-line/30 rounded-t shrink-0"
         >
           <div className="flex items-center gap-2">
             <Cpu className={`w-4.5 h-4.5 ${isGenerating ? 'text-emerald-500 animate-spin' : 'text-emerald-500'}`} />
             <div className="flex flex-col text-left">
               <span className="text-xs font-black text-white uppercase tracking-wider flex items-center gap-1">
                 {isPt ? 'LLM CONSOLE LOCAL' : isEs ? 'CONSOLA LOCAL DE LLM' : 'LOCAL LLM CONSOLE'}
-                <span className="text-[9px] bg-[#121213] border border-[#3a3a3c] text-[#818384] px-1 py-0.5 rounded lowercase font-mono">v0.1.2</span>
+                <span className="text-[11px] bg-app border border-line text-muted px-1 py-0.5 rounded lowercase font-mono">v0.1.2</span>
               </span>
-              <span className="text-[10px] text-[#818384] font-mono tracking-tight font-bold">
+              <span className="text-xs text-muted font-mono tracking-tight font-bold">
                 {isGenerating 
                   ? (isPt ? 'Decodificando tokens...' : isEs ? 'Decodificando tokens...' : 'Decoding tokens...') 
                   : (isPt ? `TermoLLM-0.12B offline [Pronto]` : isEs ? `TermoLLM-0.12B offline [Listo]` : `TermoLLM-0.12B offline [Ready]`)}
@@ -164,7 +164,7 @@ export default function LLMConsole({
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
             )}
-            {isOpen ? <ChevronDown className="w-4 h-4 text-[#818384]" /> : <ChevronUp className="w-4 h-4 text-[#818384]" />}
+            {isOpen ? <ChevronDown className="w-4 h-4 text-muted" /> : <ChevronUp className="w-4 h-4 text-muted" />}
           </div>
         </div>
 
@@ -172,17 +172,17 @@ export default function LLMConsole({
         {isOpen && (
           <div className="flex-1 flex flex-col overflow-hidden">
             {/* Nav tabs for Hyperparameters or Logs */}
-            <div className="flex border-b border-[#3a3a3c] px-4 gap-4 bg-[#121213] select-none shrink-0 text-xs">
+            <div className="flex border-b border-line px-4 gap-4 bg-app select-none shrink-0 text-xs">
               <button 
                 onClick={() => { triggerSound('click'); setActiveTab('terminal'); }}
-                className={`py-2 px-1 font-black uppercase tracking-wider flex items-center gap-1.5 border-b-2 transition-all ${activeTab === 'terminal' ? 'text-emerald-500 border-emerald-500' : 'text-[#818384] border-transparent hover:text-white'}`}
+                className={`py-2 px-1 font-black uppercase tracking-wider flex items-center gap-1.5 border-b-2 transition-all ${activeTab === 'terminal' ? 'text-emerald-500 border-emerald-500' : 'text-muted border-transparent hover:text-white'}`}
               >
                 <Terminal className="w-3.5 h-3.5" />
                 {isPt ? 'Terminal' : isEs ? 'Registros' : 'Inference Logs'}
               </button>
               <button 
                 onClick={() => { triggerSound('click'); setActiveTab('hyperparameters'); }}
-                className={`py-2 px-1 font-black uppercase tracking-wider flex items-center gap-1.5 border-b-2 transition-all ${activeTab === 'hyperparameters' ? 'text-emerald-500 border-emerald-500' : 'text-[#818384] border-transparent hover:text-white'}`}
+                className={`py-2 px-1 font-black uppercase tracking-wider flex items-center gap-1.5 border-b-2 transition-all ${activeTab === 'hyperparameters' ? 'text-emerald-500 border-emerald-500' : 'text-muted border-transparent hover:text-white'}`}
               >
                 <Settings className="w-3.5 h-3.5" />
                 {isPt ? 'Hiperparâmetros' : isEs ? 'Parámetros de IA' : 'AI Parameters'}
@@ -190,13 +190,13 @@ export default function LLMConsole({
             </div>
 
             {/* Tab content wrapper */}
-            <div className="flex-1 overflow-y-auto p-4 flex flex-col bg-[#121213]/40">
+            <div className="flex-1 overflow-y-auto p-4 flex flex-col bg-app/40">
               
               {/* TAB 1: TERMINAL STATE LOGS */}
               {activeTab === 'terminal' && (
                 <div className="flex-1 flex flex-col h-full overflow-hidden">
                   {/* Console Logs Display Terminal */}
-                  <div className="flex-1 bg-[#121213] rounded p-2.5 font-mono text-[10px] text-slate-300 overflow-y-auto border border-[#3a3a3c] flex flex-col gap-1 select-text scrollbar-thin">
+                  <div className="flex-1 bg-app rounded p-2.5 font-mono text-xs text-slate-300 overflow-y-auto border border-line flex flex-col gap-1 select-text scrollbar-thin">
                     {logs.map((log, i) => {
                       let color = 'text-slate-400';
                       if (log.type === 'system') color = 'text-sky-400';
@@ -206,7 +206,7 @@ export default function LLMConsole({
 
                       return (
                         <div key={i} className="leading-relaxed flex items-start gap-1">
-                          <span className="text-[#818384] shrink-0 font-bold">[{log.timestamp}]</span>
+                          <span className="text-muted shrink-0 font-bold">[{log.timestamp}]</span>
                           <span className={`${color} shrink-0 font-bold`}>
                             {log.type === 'token' ? '✨' : `[${log.type}]`}
                           </span>
@@ -218,17 +218,17 @@ export default function LLMConsole({
                   </div>
 
                   {/* Terminal quick auxiliary status metrics bar */}
-                  <div className="flex items-center justify-between mt-2.5 px-0.5 text-[10px] text-[#818384] font-mono tracking-tight font-bold shrink-0 select-none uppercase">
+                  <div className="flex items-center justify-between mt-2.5 px-0.5 text-xs text-muted font-mono tracking-tight font-bold shrink-0 select-none uppercase">
                     <div className="flex items-center gap-2">
-                      <span className="flex items-center gap-1 text-[#818384]"><Database className="w-3 h-3 text-emerald-500" /> {inferenceStats.memory}</span>
-                      <span className="h-2.5 w-[1px] bg-[#3a3a3c]" />
-                      <span className="flex items-center gap-1 text-[#818384]"><Flame className="w-3 h-3 text-emerald-500" /> {config.temperature}t</span>
+                      <span className="flex items-center gap-1 text-muted"><Database className="w-3 h-3 text-emerald-500" /> {inferenceStats.memory}</span>
+                      <span className="h-2.5 w-[1px] bg-line" />
+                      <span className="flex items-center gap-1 text-muted"><Flame className="w-3 h-3 text-emerald-500" /> {config.temperature}t</span>
                     </div>
 
                     <div className="flex items-center gap-2">
                       <button 
                         onClick={runDiagnostics}
-                        className="text-[9px] text-[#818384] hover:text-white flex items-center gap-1 border border-[#3a3a3c] bg-[#1a1a1b] hover:bg-[#3a3a3c] px-2 py-0.5 rounded transition-all active:scale-95 duration-100"
+                        className="text-[11px] text-muted hover:text-white flex items-center gap-1 border border-line bg-surface hover:bg-line px-2 py-0.5 rounded transition-all active:scale-95 duration-100"
                       >
                         <RefreshCw className="w-2.5 h-2.5" />
                         {isPt ? 'Diagnóstico' : isEs ? 'Diagnóstico' : 'Diagnostic Audit'}
@@ -243,39 +243,39 @@ export default function LLMConsole({
                 <div className="flex-1 flex flex-col gap-3 justify-center text-xs text-left select-none">
                   
                   {/* Model Name specification */}
-                  <div id="hyperparam-model-group" className="bg-[#121213] p-2.5 rounded border border-[#3a3a3c] flex items-center justify-between">
+                  <div id="hyperparam-model-group" className="bg-app p-2.5 rounded border border-line flex items-center justify-between">
                     <div>
-                      <p className="text-[10px] text-[#818384] uppercase font-bold tracking-wider">{labelModel}</p>
+                      <p className="text-xs text-muted uppercase font-bold tracking-wider">{labelModel}</p>
                       <h4 className="font-black text-white tracking-tight text-xs flex items-center gap-1 mt-0.5">
                         TermoLLM-0.12B-Mobile-Q4
                       </h4>
                     </div>
-                    <span className="text-[9px] bg-[#1a1a1b] border border-[#3a3a3c] text-emerald-500 px-2 py-0.5 rounded font-black tracking-wider uppercase flex items-center gap-1.5 shadow-[0_0_8px_rgba(16,185,129,0.15)]">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_4px_#10b981]" />
+                    <span className="text-[11px] bg-surface border border-line text-emerald-500 px-2 py-0.5 rounded font-black tracking-wider uppercase flex items-center gap-1.5 shadow-[0_0_8px_rgba(16,185,129,0.15)]">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_4px_#10b981]" />
                       100% {isPt ? 'Offline' : isEs ? 'Sin Conexión' : 'Offline'}
                     </span>
                   </div>
 
                   {/* Category Selection Dropdown */}
                   <div id="hyperparam-category-group" className="flex flex-col gap-1">
-                    <label className="text-[10px] text-[#818384] uppercase font-bold tracking-widest">{labelCategory}</label>
+                    <label className="text-xs text-muted uppercase font-bold tracking-widest">{labelCategory}</label>
                     <div className="relative">
                       <select 
                         value={config.category}
                         onChange={(e) => handleCategoryChange(e.target.value)}
-                        className="w-full bg-[#121213] border border-[#3a3a3c] rounded px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-550 appearance-none font-bold font-sans uppercase tracking-wide"
+                        className="w-full bg-app border border-line rounded px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-550 appearance-none font-bold font-sans uppercase tracking-wide"
                       >
                         {targetCategories.map(cat => (
-                          <option key={cat.value} value={cat.value} className="bg-[#121213] text-white font-bold">{cat.label}</option>
+                          <option key={cat.value} value={cat.value} className="bg-app text-white font-bold">{cat.label}</option>
                         ))}
                       </select>
-                      <ChevronDown className="w-3.5 h-3.5 text-[#818384] absolute col-end-1 right-2.5 top-2.5 pointer-events-none" />
+                      <ChevronDown className="w-3.5 h-3.5 text-muted absolute col-end-1 right-2.5 top-2.5 pointer-events-none" />
                     </div>
                   </div>
 
                   {/* Difficulty Selection Dropdown */}
                   <div id="hyperparam-difficulty-group" className="flex flex-col gap-1">
-                    <label className="text-[10px] text-[#818384] uppercase font-bold tracking-widest">
+                    <label className="text-xs text-muted uppercase font-bold tracking-widest">
                       {isPt ? 'Dificuldade da Geração' : isEs ? 'Dificultad de la Palabra' : 'Generation Difficulty'}
                     </label>
                     <div className="relative">
@@ -287,27 +287,27 @@ export default function LLMConsole({
                           setConfig(prev => ({ ...prev, difficulty: val }));
                           addLog('info', isPt ? `Dificuldade reconfigurada para: ${val.toUpperCase()}` : isEs ? `Dificultad reconfigurada a: ${val.toUpperCase()}` : `Generation difficulty reconfigured to: ${val.toUpperCase()}`);
                         }}
-                        className="w-full bg-[#121213] border border-[#3a3a3c] rounded px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-550 appearance-none font-bold font-sans uppercase tracking-wide"
+                        className="w-full bg-app border border-line rounded px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-550 appearance-none font-bold font-sans uppercase tracking-wide"
                       >
-                        <option value="easy" className="bg-[#121213] text-white font-bold">
+                        <option value="easy" className="bg-app text-white font-bold">
                           {isPt ? 'FÁCIL (4 LETRAS / COMUNS)' : isEs ? 'FÁCIL (4 LETRAS / COMUNES)' : 'EASY (4 LETTERS / COMMON)'}
                         </option>
-                        <option value="medium" className="bg-[#121213] text-white font-bold">
+                        <option value="medium" className="bg-app text-white font-bold">
                           {isPt ? 'MÉDIO (5 LETRAS / PADRÃO)' : isEs ? 'MEDIO (5 LETRAS / ESTÁNDAR)' : 'MEDIUM (5 LETTERS / STANDARD)'}
                         </option>
-                        <option value="hard" className="bg-[#121213] text-white font-bold">
+                        <option value="hard" className="bg-app text-white font-bold">
                           {isPt ? 'DIFÍCIL (6 LETRAS / EXÓTICO)' : isEs ? 'DIFÍCIL (6 LETRAS / EXÓTICO)' : 'HARD (6 LETTERS / EXOTIC)'}
                         </option>
                       </select>
-                      <ChevronDown className="w-3.5 h-3.5 text-[#818384] absolute col-end-1 right-2.5 top-2.5 pointer-events-none" />
+                      <ChevronDown className="w-3.5 h-3.5 text-muted absolute col-end-1 right-2.5 top-2.5 pointer-events-none" />
                     </div>
                   </div>
 
                   {/* Temperature slider */}
                   <div id="hyperparam-temperature-group" className="flex flex-col gap-1">
                     <div className="flex items-center justify-between">
-                      <label className="text-[10px] text-[#818384] uppercase font-bold tracking-widest">{labelTemp}</label>
-                      <span className="font-mono font-black text-emerald-500 bg-[#121213] border border-[#3a3a3c] px-1.5 py-0.5 rounded text-[10px]">
+                      <label className="text-xs text-muted uppercase font-bold tracking-widest">{labelTemp}</label>
+                      <span className="font-mono font-black text-emerald-500 bg-app border border-line px-1.5 py-0.5 rounded text-xs">
                         t = {config.temperature}
                       </span>
                     </div>
@@ -318,9 +318,9 @@ export default function LLMConsole({
                       step="0.05"
                       value={config.temperature}
                       onChange={(e) => handleTemperatureChange(parseFloat(e.target.value))}
-                      className="w-full h-1.5 bg-[#3a3a3c] rounded appearance-none cursor-pointer accent-emerald-500"
+                      className="w-full h-1.5 bg-line rounded appearance-none cursor-pointer accent-emerald-500"
                     />
-                    <div className="flex justify-between text-[8px] text-[#818384] font-bold uppercase tracking-wider">
+                    <div className="flex justify-between text-[11px] text-muted font-bold uppercase tracking-wider">
                       <span>{isPt ? 'Determinístico' : isEs ? 'Determinista' : 'Deterministic'}</span>
                       <span>{isPt ? 'Criativo / Complexo' : isEs ? 'Creativo / Complejo' : 'Creative / Complex'}</span>
                     </div>
@@ -329,8 +329,8 @@ export default function LLMConsole({
                   {/* Top-P settings */}
                   <div id="hyperparam-topp-group" className="flex flex-col gap-1">
                     <div className="flex items-center justify-between">
-                      <label className="text-[10px] text-[#818384] uppercase font-bold tracking-widest">{labelTopP}</label>
-                      <span className="font-mono text-emerald-500 font-bold text-[10px]">p = {config.topP}</span>
+                      <label className="text-xs text-muted uppercase font-bold tracking-widest">{labelTopP}</label>
+                      <span className="font-mono text-emerald-500 font-bold text-xs">p = {config.topP}</span>
                     </div>
                     <input 
                       type="range"
@@ -339,7 +339,7 @@ export default function LLMConsole({
                       step="0.05"
                       value={config.topP}
                       onChange={(e) => setConfig(prev => ({ ...prev, topP: parseFloat(e.target.value) }))}
-                      className="w-full h-1.5 bg-[#3a3a3c] rounded appearance-none cursor-pointer accent-emerald-500"
+                      className="w-full h-1.5 bg-line rounded appearance-none cursor-pointer accent-emerald-500"
                     />
                   </div>
 
@@ -352,7 +352,7 @@ export default function LLMConsole({
                     }}
                     className={`mt-2 font-black text-xs uppercase text-center py-2 px-3 rounded flex items-center justify-center gap-2 transition-colors duration-200 active:scale-95 ${
                       isGenerating
-                        ? 'bg-[#3a3a3c] text-[#818384] cursor-not-allowed'
+                        ? 'bg-line text-muted cursor-not-allowed'
                         : 'bg-white text-black hover:bg-emerald-500 hover:text-white'
                     }`}
                   >

@@ -147,34 +147,34 @@ function GridCell({
   // Compute styling based on state
   let bgStyles = "bg-transparent";
   let textStyles = "text-white";
-  let borderStyles = "border-2 border-[#3a3a3c]";
+  let borderStyles = "border-2 border-line";
   let animationStyles = "";
 
   if (isGuessed) {
     switch (status) {
       case 'correct':
-        bgStyles = "bg-[#10b981]";
-        borderStyles = "border-2 border-[#10b981]";
+        bgStyles = "bg-correct";
+        borderStyles = "border-2 border-correct";
         break;
       case 'present':
-        bgStyles = "bg-[#b59f3b]";
-        borderStyles = "border-2 border-[#b59f3b]";
+        bgStyles = "bg-present";
+        borderStyles = "border-2 border-present";
         break;
       case 'incorrect':
-        bgStyles = "bg-[#3a3a3c]";
-        borderStyles = "border-2 border-[#3a3a3c]";
-        textStyles = "text-[#818384]";
+        bgStyles = "bg-absent";
+        borderStyles = "border-2 border-absent";
+        textStyles = "text-absent-fg";
         break;
     }
     // Flip animations with staggered timing per column index
     animationStyles = "animate-flip";
   } else if (char) {
     bgStyles = "bg-transparent";
-    borderStyles = "border-2 border-[#565758]";
+    borderStyles = "border-2 border-line-strong";
     animationStyles = "animate-bounce-pop";
   } else {
     bgStyles = "bg-transparent";
-    borderStyles = "border-2 border-[#3a3a3c]/60";
+    borderStyles = "border-2 border-line/60";
   }
 
   // Generate clean delay styles so the flip stagger is elegant
