@@ -12,15 +12,6 @@ export interface GuessAttempt {
   evaluations: LetterEvaluation[];
 }
 
-export interface LLMConfig {
-  modelName: string;
-  temperature: number;
-  topP: number;
-  maxTokens: number;
-  category: string;
-  difficulty: 'easy' | 'medium' | 'hard';
-}
-
 export interface LLMLog {
   timestamp: string;
   type: 'system' | 'info' | 'success' | 'warning' | 'token';
@@ -44,9 +35,14 @@ export interface GameStats {
   lastPlayedDate?: string;
 }
 
+export type WordLength = 4 | 5 | 6;
+
 export interface GameSettings {
   language: 'pt' | 'en' | 'es';
   soundEnabled: boolean;
   hardMode: boolean;
   autoRevealClue: boolean;
+  wordLength: WordLength; // Classic mode word length
+  category: string; // Classic mode category filter ('all' for any)
+  showConsole: boolean; // Optional engine log console
 }
