@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings, Volume2, VolumeX, X, HelpCircle } from 'lucide-react';
+import { Settings, Volume2, VolumeX, X } from 'lucide-react';
 import { GameSettings } from '../types';
 
 interface SettingsModalProps {
@@ -9,7 +9,6 @@ interface SettingsModalProps {
   setSettings: React.Dispatch<React.SetStateAction<GameSettings>>;
   language: 'pt' | 'en' | 'es';
   triggerSound: (type: 'click' | 'flip' | 'win' | 'lose' | 'error') => void;
-  wordLength: number;
 }
 
 export default function SettingsModal({
@@ -18,8 +17,7 @@ export default function SettingsModal({
   settings,
   setSettings,
   language,
-  triggerSound,
-  wordLength
+  triggerSound
 }: SettingsModalProps) {
   if (!isOpen) return null;
 
@@ -159,7 +157,7 @@ export default function SettingsModal({
               <span className="text-xs font-black text-white uppercase tracking-wider">{labelHardMode}</span>
               <span className="text-[10px] text-[#818384] leading-normal">
                 {isPt 
-                  ? 'Dicas reveladas precisam conter novas letras de palpites anteriores.' 
+                  ? 'Letras reveladas (verdes e amarelas) devem ser usadas nos próximos palpites.' 
                   : isEs 
                     ? 'Cualquier pista revelada debe ser integrada en los siguientes intentos.' 
                     : 'Any revealed hints must be integrated in following attempts.'}
@@ -180,40 +178,6 @@ export default function SettingsModal({
 
         </div>
 
-        {/* Rules Sheet section */}
-        <div className="bg-[#121213] p-3 rounded border border-[#3a3a3c] text-[10px] text-slate-300 leading-normal text-left select-none">
-          <p className="font-bold text-white uppercase tracking-widest mb-1 text-[9px] flex items-center gap-1.5">
-            <HelpCircle className="w-3.5 h-3.5 text-emerald-500" />
-            {isPt ? 'Como jogar Termo' : isEs ? 'Cómo jugar a Termo' : 'How to play Termo'}
-          </p>
-          <p className="mb-2 text-[#818384] font-bold">
-            {isPt 
-              ? `Descubra a palavra secreta de ${wordLength} letras em 6 tentativas. A cada palpite, a cor do bloco mudará indicando quão perto você chegou:`
-              : isEs
-                ? `Descubre la palabra oculta de ${wordLength} letras en 6 intentos. Después de cada intento, el color de las fichas cambia:`
-                : `Find the hidden ${wordLength}-letter word in 6 attempts. After each guess, tiles change colors to display correctness:`}
-          </p>
-          <div className="flex flex-col gap-2 font-black uppercase tracking-wider text-[9px]">
-            <div className="flex items-center gap-2">
-              <span className="w-14 text-center bg-[#10b981] text-white rounded py-0.5">{isPt ? 'VERDE' : isEs ? 'VERDE' : 'GREEN'}</span>
-              <span className="text-[#818384] font-semibold tracking-tight normal-case">
-                {isPt ? 'A letra faz parte da palavra e está na posição correta.' : isEs ? 'La letra está en la palabra y en la posición correcta.' : 'The letter is present and in the exact index.'}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-14 text-center bg-[#b59f3b] text-white rounded py-0.5">{isPt ? 'AMARELO' : isEs ? 'AMARILLO' : 'YELLOW'}</span>
-              <span className="text-[#818384] font-semibold tracking-tight normal-case">
-                {isPt ? 'A letra está contida na palavra, mas em uma posição incorreta.' : isEs ? 'La letra está en la palabra, pero en una posición diferente.' : 'The letter is present but positioned elsewhere.'}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-14 text-center bg-[#3a3a3c] text-[#818384] border border-[#3a3a3c] rounded py-0.5">{isPt ? 'CINZA' : isEs ? 'GRIS' : 'GRAY'}</span>
-              <span className="text-[#818384] font-semibold tracking-tight normal-case">
-                {isPt ? 'A letra não faz parte de nenhuma seção da palavra secreta.' : isEs ? 'La letra no forma parte de la palabra en ningún lugar.' : 'The letter is absent from this secret word.'}
-              </span>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
