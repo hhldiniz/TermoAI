@@ -1192,43 +1192,6 @@ export function generateWordOffline(
   return chosen;
 }
 
-// Full vocabulary of legal 5-letter search terms for validating user guesses in Termo.
-// Accents will be normalized when checking. We include extra common words to avoid false negatives.
-export const VALID_GUESS_VOCABULARY_PT = [
-  'TERRA', 'PEDRA', 'FOLHA', 'CHUVA', 'VENTO', 'CLIMA', 'FLORA', 'NUVEM',
-  'GATO', 'TIGRE', 'PEIXE', 'LESMA', 'CISNE', 'COBRA', 'ZEBRA', 'AGUIA',
-  'PRATO', 'LIVRO', 'COPO', 'CHAVE', 'GARFO', 'PUDIM', 'ARROZ', 'LIMAO',
-  'PINTO', 'PIZZA', 'ROBO', 'MOUSE', 'DADOS', 'TELAS', 'FOCAL', 'NUCLEO',
-  'NIVEL', 'BRISA', 'HOTEL', 'PRAIA', 'TORRE', 'MUSEU', 'SELVA', 'ARENA',
-  'CAMPO', 'ANIMA', 'AMIGO', 'CORPO', 'TEMPO', 'MENTE', 'RADIO', 'RELOG',
-  'PORTA', 'CANETA', 'LAPIS', 'MESA', 'PASTA', 'PAPEL', 'VAPOR', 'SONHO',
-  'NORTI', 'SULIS', 'GOVER', 'FORCA', 'CARRO', 'NAVIO', 'AVIAO', 'TREMS',
-  'FAZDA', 'VILAS', 'CIDCO', 'PAULO', 'CARTA', 'FIRMA', 'VISTA', 'POETA',
-  'SABIO', 'FERRO', 'OUROS', 'PRATA', 'COBRE', 'ZINCO', 'CHAPA', 'PLACA',
-  'GLOBO', 'MAPAS', 'MITOS', 'LINHA', 'SINAL', 'REDEI', 'GRUPO', 'FOTOS',
-  'VILAO', 'HEROI', 'FADAS', 'MANGA', 'MACAJ', 'PERAS', 'MELAO', 'AMORA',
-  'NOZES', 'TRIGO', 'LEITE', 'QUEIJ', 'CARNE', 'OVOSS', 'BOLOS', 'DOCES'
-];
-
-export const VALID_GUESS_VOCABULARY_EN = [
-  'EARTH', 'STONE', 'CLOUD', 'STORM', 'PLANT', 'TIGER', 'EAGLE', 'SHARK',
-  'SNAKE', 'KOALA', 'BREAD', 'PLATE', 'CLOCK', 'CHAIR', 'PIZZA', 'ROBOT',
-  'MOUSE', 'PIXEL', 'LOGIC', 'MICRO', 'HOTEL', 'BEACH', 'TOWER', 'HOUSE',
-  'OCEAN', 'APPLE', 'GRAPE', 'PEACH', 'BERRY', 'MANGO', 'LEMON', 'MELON',
-  'SWEET', 'CANDY', 'WATER', 'JUICE', 'GLASS', 'KNIFE', 'SPOON', 'PAPER',
-  'BOARD', 'LIGHT', 'SOUND', 'PHASE', 'WAVEI', 'STARS', 'MOONS', 'SPACE',
-  'WORLD', 'TRAIN', 'PLANE', 'TRUCK', 'CYCLE', 'MOTOR', 'DRIVE', 'SPEED',
-  'GLOVE', 'SHIRT', 'PANTS', 'SHOES', 'COATS', 'SOCKS', 'Watch', 'CLOCK',
-  'SMILE', 'LAUGH', 'FEEL', 'SPEAK', 'HEART', 'BRAIN', 'NERVE', 'BLOOD',
-  'BONES', 'SKINS', 'FLESH', 'GRASS', 'TREES', 'FRUIT', 'GRAIN', 'SEEDS'
-];
-
-export function isValidGuess(guess: string, lang: 'pt' | 'en' | 'es', expectedLength: number = 5): boolean {
-  const normGuess = normalizeText(guess);
-  if (normGuess.length !== expectedLength) return false;
-  return /^[A-Z]+$/.test(normGuess);
-}
-
 export interface LargeWordData {
   word: string;
   category: string;

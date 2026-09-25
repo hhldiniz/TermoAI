@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { HelpCircle, BarChart3, Settings, AlertCircle, RefreshCw, Cpu, Check, HelpCircle as HelpIcon, Sparkles, Heart, Trophy } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GameStatus, LetterEvaluation, LetterStatus, GameStats, GameSettings, LLMConfig, LLMLog, WordData } from './types';
-import { generateWordOffline, normalizeText, isValidGuess, getWordsByLanguage, getRandomLargeWord, LargeWordData } from './words';
+import { generateWordOffline, normalizeText, getRandomLargeWord, LargeWordData } from './words';
+import { loadDictionary, isKnownWord } from './dictionary';
 import { playSound } from './utils/audio';
 
 // Components
@@ -12,6 +13,7 @@ import Keyboard from './components/Keyboard';
 import LLMConsole from './components/LLMConsole';
 import StatsModal from './components/StatsModal';
 import SettingsModal from './components/SettingsModal';
+import HelpModal from './components/HelpModal';
 
 export default function App() {
   // 1. Initial Default Configuration States
@@ -74,6 +76,19 @@ export default function App() {
   const [revealedCount, setRevealedCount] = useState(0);
   const [shakedRowIndex, setShakedRowIndex] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Modal Triggers
+  const [isStatsOpen, setIsStatsOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const isAnyModalOpen = isStatsOpen || isSettingsOpen || isHelpOpen;
+
+  // Preload the guess dictionary for the active language
+  useEffect(() => {
+    loadDictionary(settings.language).catch((e) => {
+      console.error('Failed to load dictionary', e);
+    });
+  }, [settings.language]);
 
   // --- MULTI-GAME MODE SYSTEM ---
   const [gameMode, setGameMode] = useState<'menu' | 'standard' | 'enigma' | 'survival'>('menu');
@@ -258,7 +273,7 @@ export default function App() {
 
   // Enigma Countdown Timer and Progressive Score Loss
   useEffect(() => {
-    if (gameMode !== 'enigma' || enigmaStatus !== 'playing') {
+    if (gameMode !== 'enigma' || enigmaStatus !== 'playing' || isAnyModalOpen) {
       return;
     }
 
@@ -294,11 +309,7 @@ export default function App() {
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, [gameMode, enigmaStatus, enigmaWord, isPt, triggerSound, pushLog]);
-
-  // Modal Triggers
-  const [isStatsOpen, setIsStatsOpen] = useState(false);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  }, [gameMode, enigmaStatus, enigmaWord, isPt, triggerSound, pushLog, isAnyModalOpen]);
 
   // LLM Engine Console States
   const [config, setConfig] = useState<LLMConfig>({
@@ -408,7 +419,7 @@ export default function App() {
     const targetLetters = target.split('');
     const guessLetters = guess.split('');
 
-    const evaluations: LetterEvaluation[] = Array(5).fill(null).map((_, i) => ({
+    const evaluations: LetterEvaluation[] = Array(targetLetters.length).fill(null).map((_, i) => ({
       char: guessLetters[i],
       status: 'incorrect'
     }));
@@ -420,7 +431,7 @@ export default function App() {
     }
 
     // Passes 1: Green exact hits matching
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < targetLetters.length; i++) {
       if (guessLetters[i] === targetLetters[i]) {
         evaluations[i].status = 'correct';
         targetCount[guessLetters[i]]--;
@@ -428,7 +439,7 @@ export default function App() {
     }
 
     // Passes 2: Yellow displaced elements matching
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < targetLetters.length; i++) {
       if (evaluations[i].status !== 'correct') {
         const char = guessLetters[i];
         if (targetCount[char] && targetCount[char] > 0) {
@@ -462,6 +473,13 @@ export default function App() {
       return;
     }
 
+    // Dictionary validation (skipped only while the word list is still loading)
+    if (isKnownWord(normalizedGuess, settings.language) === false) {
+      showAlert(isPt ? 'Palavra não aceita!' : isEs ? '¡Palabra no válida!' : 'Not in word list!');
+      triggerErrorShaking();
+      return;
+    }
+
     // Hard Mode Validation
     if (settings.hardMode && guesses.length > 0) {
       const lastEval = guesses[guesses.length - 1].evaluations;
@@ -472,7 +490,27 @@ export default function App() {
             ? `A ${i+1}ª letra deve ser ${lastEval[i].char}!` 
             : isEs
               ? `¡La ${i+1}ª letra debe ser ${lastEval[i].char}!`
-              : `The ${i+1}th character must be ${lastEval[i].char}!`);
+              : `Letter ${i+1} must be ${lastEval[i].char}!`);
+          triggerErrorShaking();
+          return;
+        }
+      }
+
+      // Every revealed letter (green or yellow) must be reused, as many times as it was revealed
+      const requiredCounts: Record<string, number> = {};
+      for (const evaluation of lastEval) {
+        if (evaluation.status === 'correct' || evaluation.status === 'present') {
+          requiredCounts[evaluation.char] = (requiredCounts[evaluation.char] || 0) + 1;
+        }
+      }
+      for (const [char, required] of Object.entries(requiredCounts)) {
+        const used = normalizedGuess.split('').filter(c => c === char).length;
+        if (used < required) {
+          showAlert(isPt
+            ? `O palpite deve conter ${char}!`
+            : isEs
+              ? `¡El intento debe contener ${char}!`
+              : `Guess must contain ${char}!`);
           triggerErrorShaking();
           return;
         }
@@ -619,12 +657,16 @@ export default function App() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.repeat) return;
-      if (isStatsOpen || isSettingsOpen) return;
+      if (isAnyModalOpen) return;
+      // Text inputs (Enigma / Survival answer bars) handle their own typing and Enter
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
 
       const key = e.key.toUpperCase();
       if (key === 'ESCAPE') {
         setIsStatsOpen(false);
         setIsSettingsOpen(false);
+        setIsHelpOpen(false);
       } else if (key === 'BACKSPACE') {
         handleKeyPress('BACKSPACE');
       } else if (key === 'ENTER') {
@@ -636,7 +678,7 @@ export default function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleKeyPress, isStatsOpen, isSettingsOpen]);
+  }, [handleKeyPress, isAnyModalOpen]);
 
   // Accumulate highlighted statuses per character key
   const letterStatuses: Record<string, LetterStatus> = {};
@@ -700,6 +742,18 @@ export default function App() {
     return letterStatuses;
   };
 
+  // Starts a new round of whichever mode is active
+  const startNewGameForCurrentMode = () => {
+    if (gameMode === 'enigma') {
+      startEnigmaGame();
+    } else if (gameMode === 'survival') {
+      startSurvivalGame();
+    } else {
+      setGameMode('standard');
+      generateNewWord();
+    }
+  };
+
   // Wipes all data clean and reloads
   const handleResetStatistics = () => {
     const freshStats: GameStats = {
@@ -738,7 +792,7 @@ export default function App() {
             {/* Help guidelines */}
             <button 
               id="header-btn-help"
-              onClick={() => { triggerSound('click'); setIsSettingsOpen(true); }}
+              onClick={() => { triggerSound('click'); setIsHelpOpen(true); }}
               className="p-1 text-slate-400 hover:text-white hover:bg-[#3a3a3c] active:scale-90 rounded transition-all cursor-pointer"
             >
               <HelpCircle className="w-4.5 h-4.5 sm:w-5 sm:h-5 pointer-events-none" />
@@ -1484,7 +1538,7 @@ export default function App() {
           language={settings.language}
           onResetStats={handleResetStatistics}
           isGameFinished={gameStatus !== 'playing'}
-          onNewGame={() => generateNewWord()}
+          onNewGame={startNewGameForCurrentMode}
           triggerSound={triggerSound}
         />
 
@@ -1495,7 +1549,15 @@ export default function App() {
           setSettings={setSettings}
           language={settings.language}
           triggerSound={triggerSound}
+        />
+
+        <HelpModal
+          isOpen={isHelpOpen}
+          onClose={() => setIsHelpOpen(false)}
+          language={settings.language}
+          gameMode={gameMode}
           wordLength={wordLength}
+          triggerSound={triggerSound}
         />
 
       </div>
