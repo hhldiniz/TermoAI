@@ -33,8 +33,6 @@ export default function SettingsModal({
   const labelWordLength = t.settings.wordLength;
   const labelCategory = t.settings.category;
   const labelClassicNote = t.settings.classicNote;
-  const labelConsole = t.settings.console;
-  const labelConsoleDesc = t.settings.consoleDesc;
   const labelAutoClue = t.settings.autoHint;
   const labelAutoClueDesc = t.settings.autoHintDesc;
 
@@ -254,28 +252,6 @@ export default function SettingsModal({
               aria-label={t.settings.highContrast}
               className={`w-10 h-6 rounded-full p-0.5 transition-colors flex items-center cursor-pointer ${
                 settings.highContrast ? 'bg-emerald-500 justify-end' : 'bg-line justify-start'
-              }`}
-            >
-              <span className="w-4 h-4 rounded-full shadow bg-white" />
-            </button>
-          </div>
-
-          {/* ENGINE CONSOLE */}
-          <div className="flex items-center justify-between border-t border-line/40 pt-3">
-            <div className="flex flex-col gap-0.5 max-w-[75%]">
-              <span className="text-xs font-black text-white uppercase tracking-wider">{labelConsole}</span>
-              <span className="text-xs text-muted leading-normal">{labelConsoleDesc}</span>
-            </div>
-            <button
-              onClick={() => {
-                playSound('click');
-                setSettings(prev => ({ ...prev, showConsole: !prev.showConsole }));
-              }}
-              role="switch"
-              aria-checked={settings.showConsole}
-              aria-label={labelConsole}
-              className={`w-10 h-6 rounded-full p-0.5 transition-colors flex items-center cursor-pointer ${
-                settings.showConsole ? 'bg-emerald-500 justify-end' : 'bg-line justify-start'
               }`}
             >
               <span className="w-4 h-4 rounded-full shadow bg-white" />

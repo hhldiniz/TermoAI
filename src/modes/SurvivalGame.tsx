@@ -22,7 +22,7 @@ interface SurvivalGameProps {
 }
 
 export default function SurvivalGame({ restartToken, onRunEnd, onStateChange }: SurvivalGameProps) {
-  const { settings, t, triggerSound, pushLog, announce, isAnyModalOpen } = useGame();
+  const { settings, t, triggerSound, announce, isAnyModalOpen } = useGame();
 
   const [word, setWord] = useState<LargeWordData | null>(null);
   // Positions shown after wrong tries (letters the player already placed correctly)
@@ -47,8 +47,7 @@ export default function SurvivalGame({ restartToken, onRunEnd, onStateChange }: 
     setStatus('playing');
     setMessage(null);
     setIsTransitioning(false);
-    pushLog('system', isFresh ? t.log.survivalStarted : t.log.survivalNextWord);
-  }, [settings.language, pushLog, t]);
+  }, [settings.language, t]);
 
   const startRun = useCallback(() => {
     if (transitionTimer.current) clearTimeout(transitionTimer.current);
@@ -89,8 +88,7 @@ export default function SurvivalGame({ restartToken, onRunEnd, onStateChange }: 
       setInput('');
       setMessage(null);
       setStreak(nextStreak);
-      pushLog('success', t.log.survivalCorrect(nextStreak));
-      announce(t.log.survivalCorrect(nextStreak));
+      announce(t.a11y.survivalCorrect(nextStreak));
       scheduleNextWord();
       return;
     }
@@ -108,7 +106,6 @@ export default function SurvivalGame({ restartToken, onRunEnd, onStateChange }: 
       setTriesLeft(nextTries);
       setMessage(t.survival.wrongAttempt(nextTries));
       announce(t.survival.wrongAttempt(nextTries));
-      pushLog('info', t.log.survivalWrong(cleanGuess, lives));
       return;
     }
 
@@ -122,12 +119,10 @@ export default function SurvivalGame({ restartToken, onRunEnd, onStateChange }: 
       triggerSound('lose');
       setMessage(t.survival.gameOverMessage(word.word));
       announce(t.survival.lostText(streak, word.word));
-      pushLog('warning', t.log.survivalOver(streak));
       onRunEnd(streak);
     } else {
       setMessage(t.survival.wrongGuess(nextLives));
       announce(t.survival.wrongGuess(nextLives));
-      pushLog('info', t.log.survivalWrong(cleanGuess, nextLives));
       scheduleNextWord();
     }
   };

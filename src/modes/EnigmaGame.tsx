@@ -20,7 +20,7 @@ interface EnigmaGameProps {
 }
 
 export default function EnigmaGame({ restartToken, onResult, onStateChange }: EnigmaGameProps) {
-  const { settings, t, triggerSound, pushLog, announce, isAnyModalOpen } = useGame();
+  const { settings, t, triggerSound, announce, isAnyModalOpen } = useGame();
 
   const [word, setWord] = useState<LargeWordData | null>(null);
   const [revealedLetters, setRevealedLetters] = useState<string[]>([]);
@@ -40,8 +40,7 @@ export default function EnigmaGame({ restartToken, onResult, onStateChange }: En
     setStatus('playing');
     setMessage(null);
     setTimeLeft(START_TIME);
-    pushLog('system', t.log.enigmaStarted);
-  }, [settings.language, pushLog, t]);
+  }, [settings.language, t]);
 
   useEffect(() => {
     startGame();
@@ -72,7 +71,6 @@ export default function EnigmaGame({ restartToken, onResult, onStateChange }: En
       setRevealedLetters(word.word.split(''));
       setInput('');
       setMessage(null);
-      pushLog('success', t.log.enigmaWon(score));
       announce(t.enigma.solvedText(score));
     } else {
       triggerSound('error');
@@ -94,8 +92,7 @@ export default function EnigmaGame({ restartToken, onResult, onStateChange }: En
     setRevealedLetters(prev => [...prev, randomChar]);
     setScore(prev => Math.max(0, prev - PENALTY));
     triggerSound('flip');
-    pushLog('info', t.log.enigmaLetterRevealed(randomChar));
-    announce(t.log.enigmaLetterRevealed(randomChar));
+    announce(t.a11y.enigmaLetterRevealed(randomChar));
 
     const remaining = word.word.split('').filter(c => c !== randomChar && !revealedLetters.includes(c));
     if (remaining.length === 0) {
@@ -109,8 +106,7 @@ export default function EnigmaGame({ restartToken, onResult, onStateChange }: En
     if (status === 'playing' && score <= 0) {
       setStatus('lost');
       triggerSound('lose');
-      pushLog('warning', t.log.enigmaZeroScore(word?.word ?? ''));
-      announce(t.log.enigmaZeroScore(word?.word ?? ''));
+      announce(t.a11y.enigmaZeroScore(word?.word ?? ''));
     }
   }, [score, status]);
 
@@ -124,8 +120,7 @@ export default function EnigmaGame({ restartToken, onResult, onStateChange }: En
           clearInterval(intervalId);
           setStatus('lost');
           triggerSound('lose');
-          pushLog('warning', t.log.enigmaTimeout(word.word));
-          announce(t.log.enigmaTimeout(word.word));
+          announce(t.a11y.enigmaTimeout(word.word));
           return 0;
         }
 
@@ -137,7 +132,6 @@ export default function EnigmaGame({ restartToken, onResult, onStateChange }: En
           setScore(prevScore => {
             const nextScore = Math.max(1, prevScore - 1);
             if (nextScore === 1 && prevScore > 1) {
-              pushLog('token', t.log.enigmaCriticalScore);
             }
             return nextScore;
           });
@@ -148,7 +142,7 @@ export default function EnigmaGame({ restartToken, onResult, onStateChange }: En
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, [status, word, t, triggerSound, pushLog, announce, isAnyModalOpen]);
+  }, [status, word, t, triggerSound, announce, isAnyModalOpen]);
 
   const handleKey = (key: string) => {
     if (!word || status !== 'playing') return;

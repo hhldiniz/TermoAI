@@ -43,7 +43,7 @@ interface ClassicGameProps {
 }
 
 export default function ClassicGame({ restartToken, onResult, onShowStats, onStateChange }: ClassicGameProps) {
-  const { settings, t, triggerSound, pushLog, announce, isAnyModalOpen } = useGame();
+  const { settings, t, triggerSound, announce, isAnyModalOpen } = useGame();
 
   // Read once on mount so a reload or a trip to the menu resumes the same game
   const [restored] = useState(() => loadSavedGame(settings.language));
@@ -67,8 +67,7 @@ export default function ClassicGame({ restartToken, onResult, onShowStats, onSta
     setHintRevealed(false);
     setErrorMessage(null);
     setActiveWord(solvedWord);
-    pushLog('success', t.log.wordPicked(solvedWord.word.length, solvedWord.category));
-  }, [settings.language, settings.category, settings.wordLength, t, pushLog]);
+  }, [settings.language, settings.category, settings.wordLength, t]);
 
   // Pick a word on start (unless a saved game was restored), and again when word
   // settings change if no guess was made yet
@@ -167,18 +166,15 @@ export default function ClassicGame({ restartToken, onResult, onShowStats, onSta
     if (guess === normalizeText(activeWord.word)) {
       setGameStatus('won');
       triggerSound('win');
-      pushLog('success', t.log.classicWon(nextGuesses.length));
       announce(`${spokenResult} ${t.classic.won}`);
       onResult(true, nextGuesses.length);
     } else if (nextGuesses.length >= MAX_GUESSES) {
       setGameStatus('lost');
       triggerSound('lose');
-      pushLog('warning', t.log.classicLost(activeWord.word));
-      announce(`${spokenResult} ${t.log.classicLost(activeWord.word)}`);
+      announce(`${spokenResult} ${t.a11y.classicLost(activeWord.word)}`);
       onResult(false, nextGuesses.length);
     } else if (settings.autoRevealClue && nextGuesses.length === 3 && !hintRevealed) {
       setHintRevealed(true);
-      pushLog('info', t.log.autoHint);
       announce(`${spokenResult} ${t.common.hint} ${activeWord.clue}`);
     } else {
       announce(spokenResult);
@@ -277,7 +273,6 @@ export default function ClassicGame({ restartToken, onResult, onShowStats, onSta
                 onClick={() => {
                   triggerSound('click');
                   setHintRevealed(true);
-                  pushLog('info', t.log.hintRevealed);
                 }}
                 className="mt-1 flex items-center gap-1.5 text-[11px] sm:text-xs bg-white text-black hover:bg-emerald-700 hover:text-white font-black uppercase tracking-widest py-1 px-2.5 sm:py-1.5 sm:px-3 rounded transition-colors active:scale-95 cursor-pointer"
               >
