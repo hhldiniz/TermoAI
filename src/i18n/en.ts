@@ -27,7 +27,7 @@ const en = {
     enigmaBadge: '3 minutes',
     enigmaDesc: 'Guess a long word from its clue. Revealing letters costs points, and the clock is ticking.',
     survivalBadge: '3 lives',
-    survivalDesc: 'Solve as many words in a row as you can from their clues. Each miss costs one of 3 lives.',
+    survivalDesc: 'Solve as many words in a row as you can. You get 3 tries per word; running out costs one of 3 lives.',
     language: 'Language:',
     switchLanguage: 'Switch language'
   },
@@ -41,7 +41,10 @@ const en = {
     onlyLetters: 'Use letters only!',
     notInList: 'Not in word list!',
     letterMustBe: (pos: number, char: string) => `Letter ${pos} must be ${char}!`,
-    mustContain: (char: string) => `Guess must contain ${char}!`
+    mustContain: (char: string) => `Guess must contain ${char}!`,
+    share: 'Share',
+    copied: 'Result copied to the clipboard!',
+    shareTitle: (result: string) => `TermoAI ${result}`
   },
 
   enigma: {
@@ -61,7 +64,9 @@ const en = {
     solvedCount: (n: number) => `${n} solved`,
     nextWordIn: 'NEXT WORD IN...',
     placeholder: 'E.G. KEYBOARD',
-    wrongGuess: (lives: number) => `Wrong! ${lives} ${lives === 1 ? 'life' : 'lives'} left. Loading the next word...`,
+    wrongGuess: (lives: number) => `Out of tries! ${lives} ${lives === 1 ? 'life' : 'lives'} left. Loading the next word...`,
+    wrongAttempt: (tries: number) => `Not quite! ${tries} ${tries === 1 ? 'try' : 'tries'} left for this word. Letters in the right place are now shown.`,
+    tries: 'Tries:',
     gameOverMessage: (word: string) => `Game over! The word was ${word}`,
     correctTitle: 'CORRECT!',
     loadingNext: 'Loading the next word...',
@@ -92,8 +97,9 @@ const en = {
     ],
     survivalRules: [
       'Guess the hidden word using the category clue.',
-      'You get one guess per word and start with 3 lives.',
-      'Each wrong guess costs a life. Solve as many words in a row as you can!'
+      'You get 3 tries per word and start with 3 lives.',
+      'A wrong try reveals the letters you placed correctly.',
+      'Using all 3 tries on a word costs a life. Solve as many words in a row as you can!'
     ]
   },
 
@@ -125,7 +131,18 @@ const en = {
     distribution: 'Guess distribution',
     newGame: 'New game',
     reset: 'Reset stats',
-    resetConfirm: 'Are you sure you want to reset all saved statistics?'
+    resetConfirm: 'Are you sure you want to reset all saved statistics?',
+    won: 'Won',
+    bestScore: 'Best score',
+    runs: 'Runs',
+    bestStreak: 'Best streak'
+  },
+
+  confirm: {
+    title: 'Leave this game?',
+    body: 'Your progress in this game will be lost.',
+    leave: 'Leave',
+    stay: 'Keep playing'
   },
 
   console: {

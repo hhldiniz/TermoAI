@@ -29,7 +29,7 @@ const pt: Messages = {
     enigmaBadge: '3 minutos',
     enigmaDesc: 'Descubra uma palavra longa pela dica. Revelar letras custa pontos, e o tempo está correndo.',
     survivalBadge: '3 vidas',
-    survivalDesc: 'Acerte o máximo de palavras seguidas pela dica. Cada erro custa uma das 3 vidas.',
+    survivalDesc: 'Acerte o máximo de palavras seguidas. São 3 tentativas por palavra; esgotá-las custa uma das 3 vidas.',
     language: 'Idioma:',
     switchLanguage: 'Mudar idioma'
   },
@@ -43,7 +43,10 @@ const pt: Messages = {
     onlyLetters: 'Use apenas letras!',
     notInList: 'Palavra não aceita!',
     letterMustBe: (pos, char) => `A ${pos}ª letra deve ser ${char}!`,
-    mustContain: (char) => `O palpite deve conter ${char}!`
+    mustContain: (char) => `O palpite deve conter ${char}!`,
+    share: 'Compartilhar',
+    copied: 'Resultado copiado!',
+    shareTitle: (result) => `TermoAI ${result}`
   },
 
   enigma: {
@@ -63,7 +66,9 @@ const pt: Messages = {
     solvedCount: (n) => `${n} ${n === 1 ? 'acerto' : 'acertos'}`,
     nextWordIn: 'PRÓXIMA PALAVRA EM...',
     placeholder: 'EX: COMPUTADOR',
-    wrongGuess: (lives) => `Incorreto! ${lives === 1 ? 'Resta 1 vida' : `Restam ${lives} vidas`}. Carregando a próxima palavra...`,
+    wrongGuess: (lives) => `Tentativas esgotadas! ${lives === 1 ? 'Resta 1 vida' : `Restam ${lives} vidas`}. Carregando a próxima palavra...`,
+    wrongAttempt: (tries) => `Quase! ${tries === 1 ? 'Resta 1 tentativa' : `Restam ${tries} tentativas`} nesta palavra. As letras na posição certa foram reveladas.`,
+    tries: 'Tentativas:',
     gameOverMessage: (word) => `Fim de jogo! A palavra era ${word}`,
     correctTitle: 'ACERTOU!',
     loadingNext: 'Carregando a próxima palavra...',
@@ -94,8 +99,9 @@ const pt: Messages = {
     ],
     survivalRules: [
       'Adivinhe a palavra escondida usando a dica da categoria.',
-      'Você tem um palpite por palavra e começa com 3 vidas.',
-      'Cada erro custa uma vida. Acerte o máximo de palavras seguidas!'
+      'Você tem 3 tentativas por palavra e começa com 3 vidas.',
+      'Uma tentativa errada revela as letras que você acertou na posição.',
+      'Esgotar as 3 tentativas de uma palavra custa uma vida. Acerte o máximo de palavras seguidas!'
     ]
   },
 
@@ -127,7 +133,18 @@ const pt: Messages = {
     distribution: 'Distribuição de tentativas',
     newGame: 'Novo jogo',
     reset: 'Limpar dados',
-    resetConfirm: 'Deseja mesmo apagar todas as estatísticas salvas?'
+    resetConfirm: 'Deseja mesmo apagar todas as estatísticas salvas?',
+    won: 'Vitórias',
+    bestScore: 'Melhor pontuação',
+    runs: 'Partidas',
+    bestStreak: 'Melhor sequência'
+  },
+
+  confirm: {
+    title: 'Sair deste jogo?',
+    body: 'O progresso deste jogo será perdido.',
+    leave: 'Sair',
+    stay: 'Continuar jogando'
   },
 
   console: {
