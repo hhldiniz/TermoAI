@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { GameMode, GameSettings, GameStats, LLMLog, LogType, SoundType } from './types';
+import { GameMode, GameSettings, GameStats, SoundType } from './types';
 import { loadDictionary } from './dictionary';
 import { getMessages, getHtmlLang } from './i18n';
 import { playSound } from './utils/audio';
@@ -9,7 +9,6 @@ import { usePersistentState } from './hooks/usePersistentState';
 import AndroidFrame from './components/AndroidFrame';
 import Header from './components/Header';
 import ModeMenu from './components/ModeMenu';
-import LLMConsole from './components/LLMConsole';
 import StatsModal from './components/StatsModal';
 import SettingsModal from './components/SettingsModal';
 import HelpModal from './components/HelpModal';
@@ -25,7 +24,6 @@ const DEFAULT_SETTINGS: GameSettings = {
   autoRevealClue: true,
   wordLength: 5,
   category: 'all',
-  showConsole: false,
   highContrast: false
 };
 
@@ -82,12 +80,6 @@ export default function App() {
     playSound(type, settings.soundEnabled);
   }, [settings.soundEnabled]);
 
-  // Engine log (shown in the optional console)
-  const [logs, setLogs] = useState<LLMLog[]>([]);
-  const pushLog = useCallback((type: LogType, message: string) => {
-    const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    setLogs(prev => [...prev, { timestamp, type, message }]);
-  }, []);
 
   // Screen reader announcements (rendered in a visually hidden live region)
   const [announcement, setAnnouncement] = useState('');
@@ -180,7 +172,6 @@ export default function App() {
   }, []);
 
   const selectMode = (mode: Exclude<GameMode, 'menu'>) => {
-    if (mode === 'standard') pushLog('system', t.log.classicSelected);
     setGameMode(mode);
   };
 
@@ -191,18 +182,17 @@ export default function App() {
 
   const handleResetStatistics = () => {
     setStats(EMPTY_STATS);
-    pushLog('system', t.log.statsReset);
   };
 
   const contextValue = useMemo<GameContextValue>(
-    () => ({ settings, t, triggerSound, pushLog, announce, isAnyModalOpen }),
-    [settings, t, triggerSound, pushLog, announce, isAnyModalOpen]
+    () => ({ settings, t, triggerSound, announce, isAnyModalOpen }),
+    [settings, t, triggerSound, announce, isAnyModalOpen]
   );
 
   return (
     <GameContext.Provider value={contextValue}>
       <AndroidFrame>
-        <div id="game-app-stage" className={`flex-1 min-h-0 w-full bg-app flex flex-col relative select-none justify-between ${settings.showConsole ? 'pb-[60px] sm:pb-20' : 'pb-2'}`}>
+        <div id="game-app-stage" className={`flex-1 min-h-0 w-full bg-app flex flex-col relative select-none justify-between pb-2`}>
           <Header
             gameMode={gameMode}
             // Classic saves its game, so only Enigma and Survival lose progress when leaving
@@ -247,10 +237,6 @@ export default function App() {
 
           {gameMode === 'survival' && (
             <SurvivalGame restartToken={restartToken} onRunEnd={handleSurvivalEnd} onStateChange={handleModeState} />
-          )}
-
-          {settings.showConsole && (
-            <LLMConsole language={settings.language} logs={logs} setLogs={setLogs} triggerSound={triggerSound} />
           )}
 
           <StatsModal

@@ -4,8 +4,6 @@ export type GameMode = 'menu' | 'standard' | 'enigma' | 'survival';
 
 export type SoundType = 'click' | 'flip' | 'win' | 'lose' | 'error';
 
-export type LogType = 'system' | 'info' | 'success' | 'warning' | 'token';
-
 export type LetterStatus = 'empty' | 'incorrect' | 'present' | 'correct';
 
 export interface LetterEvaluation {
@@ -16,12 +14,6 @@ export interface LetterEvaluation {
 export interface GuessAttempt {
   word: string;
   evaluations: LetterEvaluation[];
-}
-
-export interface LLMLog {
-  timestamp: string;
-  type: LogType;
-  message: string;
 }
 
 export interface WordData {
@@ -52,6 +44,5 @@ export interface GameSettings {
   autoRevealClue: boolean;
   wordLength: WordLength; // Classic mode word length
   category: string; // Classic mode category filter ('all' for any)
-  showConsole: boolean; // Optional engine log console
   highContrast: boolean; // Color-blind friendly palette (orange/blue)
 }

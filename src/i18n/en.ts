@@ -116,8 +116,6 @@ const en = {
     autoHintDesc: 'Reveals the word hint automatically after the 3rd guess.',
     hardMode: 'Hard mode',
     hardModeDesc: 'Revealed letters (green and yellow) must be used in later guesses.',
-    console: 'Engine console',
-    consoleDesc: "Shows a panel with the game's internal messages.",
     highContrast: 'Color-blind mode',
     highContrastDesc: 'Uses orange and blue instead of green and yellow.'
   },
@@ -145,39 +143,18 @@ const en = {
     stay: 'Keep playing'
   },
 
-  console: {
-    title: 'Engine console',
-    empty: 'No messages yet.',
-    clear: 'Clear'
-  },
 
   a11y: {
     help: 'How to play',
     backspace: 'Delete letter',
     enter: 'Submit guess',
     status: { correct: 'correct', present: 'in the word, wrong spot', incorrect: 'not in the word', empty: '' } as Record<'correct' | 'present' | 'incorrect' | 'empty', string>,
-    guessResult: (row: number, letters: string) => `Guess ${row}: ${letters}.`
-  },
-
-  log: {
-    classicSelected: 'Classic mode selected.',
-    wordPicked: (len: number, category: string) => `New word picked: ${len} letters, category ${category}.`,
-    hintRevealed: 'Hint revealed.',
-    autoHint: 'Hint revealed automatically after the 3rd guess.',
-    classicWon: (attempt: number) => `Solved on attempt ${attempt}/6.`,
+    guessResult: (row: number, letters: string) => `Guess ${row}: ${letters}.`,
     classicLost: (word: string) => `Out of attempts. The word was ${word}.`,
-    enigmaStarted: 'New Enigma word selected.',
-    enigmaWon: (score: number) => `Enigma solved with ${score} points.`,
     enigmaZeroScore: (word: string) => `Enigma lost: no points left. The word was ${word}.`,
     enigmaTimeout: (word: string) => `Enigma lost: time is up. The word was ${word}.`,
-    enigmaCriticalScore: 'Enigma score is down to 1 point.',
     enigmaLetterRevealed: (char: string) => `Letter ${char} revealed (−15 points).`,
-    survivalStarted: 'Survival started with 3 lives.',
-    survivalNextWord: 'Survival: new word loaded.',
-    survivalCorrect: (streak: number) => `Correct! Current streak: ${streak}.`,
-    survivalOver: (streak: number) => `Survival over. Final streak: ${streak}.`,
-    survivalWrong: (guess: string, lives: number) => `Wrong guess: ${guess}. ${lives} ${lives === 1 ? 'life' : 'lives'} left.`,
-    statsReset: 'Statistics reset.'
+    survivalCorrect: (streak: number) => `Correct! Current streak: ${streak}.`
   }
 };
 

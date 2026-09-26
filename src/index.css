@@ -107,34 +107,3 @@
     scroll-behavior: auto !important;
   }
 }
-
-/* Glassmorphism overrides */
-.glass-panel {
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-:root {
-  --console-closed-h: 44px;
-}
-@media (min-width: 640px) {
-  :root {
-    --console-closed-h: 52px;
-  }
-}
-
-/* Custom scrollbar */
-.scrollbar-thin::-webkit-scrollbar {
-  width: 4px;
-}
-.scrollbar-thin::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.9);
-}
-.scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(139, 92, 246, 0.4);
-  border-radius: 4px;
-}
-.scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: rgba(139, 92, 246, 0.6);
-}

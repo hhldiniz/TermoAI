@@ -118,8 +118,6 @@ const pt: Messages = {
     autoHintDesc: 'Revela a dica da palavra após a 3ª tentativa.',
     hardMode: 'Modo difícil',
     hardModeDesc: 'Letras reveladas (verdes e amarelas) devem ser usadas nos próximos palpites.',
-    console: 'Console do motor',
-    consoleDesc: 'Mostra um painel com as mensagens internas do jogo.',
     highContrast: 'Modo daltônico',
     highContrastDesc: 'Usa laranja e azul no lugar de verde e amarelo.'
   },
@@ -147,39 +145,18 @@ const pt: Messages = {
     stay: 'Continuar jogando'
   },
 
-  console: {
-    title: 'Console do motor',
-    empty: 'Nenhuma mensagem ainda.',
-    clear: 'Limpar'
-  },
 
   a11y: {
     help: 'Como jogar',
     backspace: 'Apagar letra',
     enter: 'Enviar palpite',
     status: { correct: 'correta', present: 'na palavra, posição errada', incorrect: 'não está na palavra', empty: '' },
-    guessResult: (row, letters) => `Palpite ${row}: ${letters}.`
-  },
-
-  log: {
-    classicSelected: 'Modo Clássico selecionado.',
-    wordPicked: (len, category) => `Nova palavra escolhida: ${len} letras, categoria ${category}.`,
-    hintRevealed: 'Dica revelada.',
-    autoHint: 'Dica revelada automaticamente após a 3ª tentativa.',
-    classicWon: (attempt) => `Acertou na tentativa ${attempt}/6.`,
+    guessResult: (row, letters) => `Palpite ${row}: ${letters}.`,
     classicLost: (word) => `Tentativas esgotadas. A palavra era ${word}.`,
-    enigmaStarted: 'Nova palavra do Enigma escolhida.',
-    enigmaWon: (score) => `Enigma resolvido com ${score} pontos.`,
     enigmaZeroScore: (word) => `Enigma perdido: os pontos acabaram. A palavra era ${word}.`,
     enigmaTimeout: (word) => `Enigma perdido: o tempo acabou. A palavra era ${word}.`,
-    enigmaCriticalScore: 'A pontuação do Enigma chegou a 1 ponto.',
     enigmaLetterRevealed: (char) => `Letra ${char} revelada (−15 pontos).`,
-    survivalStarted: 'Sobrevivência iniciada com 3 vidas.',
-    survivalNextWord: 'Sobrevivência: nova palavra carregada.',
-    survivalCorrect: (streak) => `Correto! Sequência atual: ${streak}.`,
-    survivalOver: (streak) => `Sobrevivência encerrada. Sequência final: ${streak}.`,
-    survivalWrong: (guess, lives) => `Palpite errado: ${guess}. ${lives === 1 ? 'Resta 1 vida' : `Restam ${lives} vidas`}.`,
-    statsReset: 'Estatísticas apagadas.'
+    survivalCorrect: (streak) => `Correto! Sequência atual: ${streak}.`
   }
 };
 
