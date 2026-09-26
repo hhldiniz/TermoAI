@@ -1,6 +1,7 @@
 import React from 'react';
 import { RefreshCw, BarChart3, TrendingUp, X, Sparkles, Trophy } from 'lucide-react';
 import { GameStats } from '../types';
+import { getMessages } from '../i18n';
 
 interface StatsModalProps {
   isOpen: boolean;
@@ -25,16 +26,15 @@ export default function StatsModal({
 }: StatsModalProps) {
   if (!isOpen) return null;
 
-  const isPt = language === 'pt';
-  const isEs = language === 'es';
-  const labelTitle = isPt ? 'Estatísticas' : isEs ? 'Estadísticas' : 'Statistics';
-  const labelPlayed = isPt ? 'Jogos' : isEs ? 'Partidas' : 'Played';
-  const labelWinPct = isPt ? 'Vitórias' : isEs ? 'Victorias' : 'Win %';
-  const labelCurStreak = isPt ? 'Seq. Atual' : isEs ? 'Racha Ac.' : 'Cur Streak';
-  const labelMaxStreak = isPt ? 'Seq. Máx' : isEs ? 'Racha Máx.' : 'Max Streak';
-  const labelDistribution = isPt ? 'Distribuição de Tentativas' : isEs ? 'Distribución de Intentos' : 'Guess Distribution';
-  const labelNewGame = isPt ? 'Novo Jogo' : isEs ? 'Nuevo Juego' : 'New Game';
-  const labelReset = isPt ? 'Limpar Dados' : isEs ? 'Restablecer' : 'Reset Stats';
+  const t = getMessages(language);
+  const labelTitle = t.stats.title;
+  const labelPlayed = t.stats.played;
+  const labelWinPct = t.stats.winPct;
+  const labelCurStreak = t.stats.curStreak;
+  const labelMaxStreak = t.stats.maxStreak;
+  const labelDistribution = t.stats.distribution;
+  const labelNewGame = t.stats.newGame;
+  const labelReset = t.stats.reset;
 
   const totalGames = stats.gamesPlayed || 0;
   const winPercent = totalGames > 0 ? Math.round((stats.gamesWon / totalGames) * 100) : 0;
@@ -132,7 +132,7 @@ export default function StatsModal({
           {/* Wipe button */}
           <button
             onClick={() => {
-              if (confirm(isPt ? 'Deseja mesmo resetar todos os dados salvos?' : isEs ? '¿Seguro que quieres borrar todos los datos guardados?' : 'Are you sure you want to reset all saved records?')) {
+              if (confirm(t.stats.resetConfirm)) {
                 triggerSound('click');
                 onResetStats();
               }
