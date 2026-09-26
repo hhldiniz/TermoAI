@@ -26,7 +26,8 @@ export default function App() {
       autoRevealClue: true,
       wordLength: 5,
       category: 'all',
-      showConsole: false
+      showConsole: false,
+      highContrast: false
     };
     try {
       const saved = localStorage.getItem('termo_settings');
@@ -72,6 +73,11 @@ export default function App() {
   useEffect(() => {
     document.documentElement.lang = getHtmlLang(settings.language);
   }, [settings.language]);
+
+  // Color-blind palette (see index.css)
+  useEffect(() => {
+    document.documentElement.dataset.contrast = settings.highContrast ? 'high' : 'normal';
+  }, [settings.highContrast]);
 
   // Play Sound helper safeguarding settings toggle
   const triggerSound = useCallback((type: 'click' | 'flip' | 'win' | 'lose' | 'error') => {
@@ -153,6 +159,7 @@ export default function App() {
       setSurvivalMessage(null);
       setSurvivalStreak(prev => prev + 1);
       pushLog('success', t.log.survivalCorrect(survivalStreak + 1));
+      announce(t.log.survivalCorrect(survivalStreak + 1));
       
       setIsSurvivalTransitioning(true);
       // Auto transition to next word in 2.5 seconds
@@ -178,9 +185,11 @@ export default function App() {
           setSurvivalStatus('lost');
           triggerSound('lose');
           setSurvivalMessage(t.survival.gameOverMessage(survivalWord.word));
+          announce(t.survival.lostText(survivalStreak, survivalWord.word));
           pushLog('warning', t.log.survivalOver(survivalStreak));
         } else {
           setSurvivalMessage(t.survival.wrongGuess(nextLives));
+          announce(t.survival.wrongGuess(nextLives));
           pushLog('info', t.log.survivalWrong(cleanGuess, nextLives));
           
           setIsSurvivalTransitioning(true);
@@ -197,6 +206,14 @@ export default function App() {
 
   // LLM Engine Console States
   const [logs, setLogs] = useState<LLMLog[]>([]);
+
+  // Screen reader announcements (rendered in a visually hidden live region)
+  const [announcement, setAnnouncement] = useState('');
+  const announce = useCallback((message: string) => {
+    // Clear first so repeating the same message is announced again
+    setAnnouncement('');
+    setTimeout(() => setAnnouncement(message), 50);
+  }, []);
 
   const pushLog = useCallback((type: 'system' | 'info' | 'success' | 'warning' | 'token', message: string) => {
     const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -240,6 +257,7 @@ export default function App() {
       setEnigmaInput('');
       setEnigmaMessage(null);
       pushLog('success', t.log.enigmaWon(enigmaScore));
+      announce(t.enigma.solvedText(enigmaScore));
     } else {
       triggerSound('error');
       setEnigmaGuesses(prev => {
@@ -247,6 +265,7 @@ export default function App() {
         return [...prev, cleanGuess];
       });
       setEnigmaMessage(t.enigma.wrongGuess);
+      announce(t.enigma.wrongGuess);
       setEnigmaScore(prev => Math.max(0, prev - 15));
       setEnigmaInput('');
       
@@ -262,8 +281,9 @@ export default function App() {
       setEnigmaStatus('lost');
       triggerSound('lose');
       pushLog('warning', t.log.enigmaZeroScore(enigmaWord?.word ?? ''));
+      announce(t.log.enigmaZeroScore(enigmaWord?.word ?? ''));
     }
-  }, [enigmaScore, enigmaStatus, gameMode, enigmaWord, t, triggerSound, pushLog]);
+  }, [enigmaScore, enigmaStatus, gameMode, enigmaWord, t, triggerSound, pushLog, announce]);
 
   // Enigma Countdown Timer and Progressive Score Loss
   useEffect(() => {
@@ -278,6 +298,7 @@ export default function App() {
           setEnigmaStatus('lost');
           triggerSound('lose');
           pushLog('warning', t.log.enigmaTimeout(enigmaWord?.word ?? ''));
+          announce(t.log.enigmaTimeout(enigmaWord?.word ?? ''));
           return 0;
         }
 
@@ -300,7 +321,7 @@ export default function App() {
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, [gameMode, enigmaStatus, enigmaWord, t, triggerSound, pushLog, isAnyModalOpen]);
+  }, [gameMode, enigmaStatus, enigmaWord, t, triggerSound, pushLog, announce, isAnyModalOpen]);
 
   const wordLength = activeWord ? activeWord.word.length : settings.wordLength;
 
@@ -334,6 +355,7 @@ export default function App() {
 
   const showAlert = (message: string) => {
     setErrorMessage(message);
+    announce(message);
     setTimeout(() => {
       setErrorMessage(null);
     }, 3500);
@@ -444,6 +466,10 @@ export default function App() {
     
     triggerSound('flip');
     setGuesses(nextGuesses);
+    const spokenResult = t.a11y.guessResult(
+      nextGuesses.length,
+      evaluationResult.map(e => `${e.char} ${t.a11y.status[e.status]}`).join(', ')
+    );
     setCurrentGuess('');
 
     const isMatch = normalizedGuess === normalizeText(activeWord.word);
@@ -453,6 +479,7 @@ export default function App() {
       setGameStatus('won');
       triggerSound('win');
       pushLog('success', t.log.classicWon(nextGuesses.length));
+      announce(`${spokenResult} ${t.classic.won}`);
       
       // Update persistent stats
       setStats(prev => {
@@ -482,6 +509,7 @@ export default function App() {
       setGameStatus('lost');
       triggerSound('lose');
       pushLog('warning', t.log.classicLost(activeWord.word));
+      announce(`${spokenResult} ${t.log.classicLost(activeWord.word)}`);
 
       setStats(prev => ({
         ...prev,
@@ -497,6 +525,9 @@ export default function App() {
       if (settings.autoRevealClue && nextGuesses.length === 3) {
         setRevealedCount(1); // Auto unlock clue
         pushLog('info', t.log.autoHint);
+        announce(`${spokenResult} ${t.common.hint} ${activeWord.clue}`);
+      } else {
+        announce(spokenResult);
       }
     }
   };
@@ -695,13 +726,13 @@ export default function App() {
       <div id="game-app-stage" className={`flex-1 min-h-0 w-full bg-app flex flex-col relative select-none justify-between ${settings.showConsole ? 'pb-[60px] sm:pb-20' : 'pb-2'}`}>
         
         {/* Navigation / Header segment */}
-        <header className="h-12 sm:h-16 px-3 sm:px-4 flex items-center justify-between border-b border-line shrink-0 select-none bg-app z-20">
-          <div className="flex gap-1 items-center">
+        <header className="h-12 sm:h-16 px-1.5 sm:px-3 flex items-center justify-between border-b border-line shrink-0 select-none bg-app z-20">
+          <div className="flex flex-1 items-center">
             {gameMode !== 'menu' && (
               <button 
                 id="header-btn-home"
                 onClick={() => { triggerSound('click'); setGameMode('menu'); }}
-                className="p-1 px-1.5 text-emerald-400 hover:text-emerald-300 hover:bg-line active:scale-95 rounded transition-all mr-1 flex items-center justify-center cursor-pointer"
+                className="w-10 h-10 flex items-center justify-center shrink-0 text-emerald-400 hover:text-emerald-300 hover:bg-line active:scale-95 rounded transition-all cursor-pointer"
                 title={t.common.backToMenu}
                 aria-label={t.common.backToMenu}
               >
@@ -715,7 +746,9 @@ export default function App() {
             <button 
               id="header-btn-help"
               onClick={() => { triggerSound('click'); setIsHelpOpen(true); }}
-              className="p-1 text-slate-400 hover:text-white hover:bg-line active:scale-90 rounded transition-all cursor-pointer"
+              className="w-10 h-10 flex items-center justify-center shrink-0 text-slate-400 hover:text-white hover:bg-line active:scale-90 rounded transition-all cursor-pointer"
+              title={t.a11y.help}
+              aria-label={t.a11y.help}
             >
               <HelpCircle className="w-4.5 h-4.5 sm:w-5 sm:h-5 pointer-events-none" />
             </button>
@@ -725,7 +758,7 @@ export default function App() {
               <button 
                 id="header-btn-refresh"
                 onClick={() => { triggerSound('click'); generateNewWord(); }}
-                className="p-1 text-slate-400 hover:text-white hover:bg-line active:scale-95 rounded transition-all cursor-pointer"
+                className="w-10 h-10 flex items-center justify-center shrink-0 text-slate-400 hover:text-white hover:bg-line active:scale-95 rounded transition-all cursor-pointer"
                 title={t.common.newWord}
                 aria-label={t.common.newWord}
               >
@@ -738,7 +771,7 @@ export default function App() {
               <button 
                 id="header-btn-enigma-refresh"
                 onClick={() => { triggerSound('click'); startEnigmaGame(); }}
-                className="p-1 text-slate-400 hover:text-white hover:bg-line active:scale-95 rounded transition-all cursor-pointer"
+                className="w-10 h-10 flex items-center justify-center shrink-0 text-slate-400 hover:text-white hover:bg-line active:scale-95 rounded transition-all cursor-pointer"
                 title={t.common.newWord}
                 aria-label={t.common.newWord}
               >
@@ -759,12 +792,14 @@ export default function App() {
             </h1>
           </div>
 
-          <div className="flex gap-1">
+          <div className="flex flex-1 justify-end">
             {/* Stats chart */}
             <button 
               id="header-btn-stats"
               onClick={() => { triggerSound('click'); setIsStatsOpen(true); }}
-              className="p-1 text-slate-400 hover:text-white hover:bg-line active:scale-90 rounded transition-all cursor-pointer"
+              className="w-10 h-10 flex items-center justify-center shrink-0 text-slate-400 hover:text-white hover:bg-line active:scale-90 rounded transition-all cursor-pointer"
+              title={t.stats.title}
+              aria-label={t.stats.title}
             >
               <BarChart3 className="w-4.5 h-4.5 sm:w-5 sm:h-5 pointer-events-none" />
             </button>
@@ -773,7 +808,9 @@ export default function App() {
             <button 
               id="header-btn-settings"
               onClick={() => { triggerSound('click'); setIsSettingsOpen(true); }}
-              className="p-1 text-slate-400 hover:text-white hover:bg-line active:scale-90 rounded transition-all cursor-pointer"
+              className="w-10 h-10 flex items-center justify-center shrink-0 text-slate-400 hover:text-white hover:bg-line active:scale-90 rounded transition-all cursor-pointer"
+              title={t.settings.title}
+              aria-label={t.settings.title}
             >
               <Settings className="w-4.5 h-4.5 sm:w-5 sm:h-5 pointer-events-none" />
             </button>
@@ -781,8 +818,13 @@ export default function App() {
         </header>
 
         {/* Dynamic Warning Alert Overlay */}
+        {/* Screen reader announcements */}
+        <div className="sr-only-live" role="status" aria-live="polite" aria-atomic="true">
+          {announcement}
+        </div>
+
         {errorMessage && (
-          <div className="absolute top-14 left-1/2 -translate-x-1/2 bg-slate-900 border border-slate-800 text-slate-200 px-4 py-2 rounded-xl text-xs font-semibold shadow-xl z-50 flex items-center gap-1.5 animate-in fade-in duration-200">
+          <div aria-hidden="true" className="absolute top-14 left-1/2 -translate-x-1/2 bg-slate-900 border border-slate-800 text-slate-200 px-4 py-2 rounded-xl text-xs font-semibold shadow-xl z-50 flex items-center gap-1.5 animate-in fade-in duration-200">
             <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
             {errorMessage}
           </div>
@@ -873,7 +915,7 @@ export default function App() {
             </div>
 
             {/* Language indicator on the fly */}
-            <div className="mt-6 sm:mt-8 flex gap-2 items-center text-xs text-slate-500 bg-surface py-1.5 px-3 rounded-full border border-line">
+            <div className="mt-6 sm:mt-8 flex gap-2 items-center text-xs text-muted bg-surface py-1.5 px-3 rounded-full border border-line">
               <span>{t.menu.language}</span>
               <button 
                 onClick={() => {
@@ -931,7 +973,7 @@ export default function App() {
                         setRevealedCount(1);
                         pushLog('info', t.log.hintRevealed);
                       }}
-                      className="mt-1 flex items-center gap-1.5 text-[11px] sm:text-xs bg-white text-black hover:bg-emerald-500 hover:text-white font-black uppercase tracking-widest py-1 px-2.5 sm:py-1.5 sm:px-3 rounded transition-colors active:scale-95 cursor-pointer"
+                      className="mt-1 flex items-center gap-1.5 text-[11px] sm:text-xs bg-white text-black hover:bg-emerald-700 hover:text-white font-black uppercase tracking-widest py-1 px-2.5 sm:py-1.5 sm:px-3 rounded transition-colors active:scale-95 cursor-pointer"
                     >
                       <Cpu className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                       {t.classic.showHint}
@@ -949,7 +991,7 @@ export default function App() {
                       </h3>
                       <button 
                         onClick={() => { triggerSound('click'); generateNewWord(); }}
-                        className="mt-2 bg-white text-black hover:bg-emerald-500 hover:text-white font-black text-xs uppercase tracking-widest py-1.5 px-4 rounded transition-colors active:scale-95 cursor-pointer"
+                        className="mt-2 bg-white text-black hover:bg-emerald-700 hover:text-white font-black text-xs uppercase tracking-widest py-1.5 px-4 rounded transition-colors active:scale-95 cursor-pointer"
                       >
                         {t.classic.nextWord}
                       </button>
@@ -1067,6 +1109,7 @@ export default function App() {
                         setEnigmaScore(prev => Math.max(0, prev - 15));
                         triggerSound('flip');
                         pushLog('info', t.log.enigmaLetterRevealed(randomChar));
+                        announce(t.log.enigmaLetterRevealed(randomChar));
                         
                         // Check if all letters are revealed
                         const remaining = enigmaWord.word.split('').filter(c => c !== randomChar && !enigmaRevealedLetters.includes(c));
@@ -1084,7 +1127,7 @@ export default function App() {
                   ) : (
                     <button
                       onClick={startEnigmaGame}
-                      className="w-full h-9 flex items-center justify-center gap-1.5 bg-emerald-500 hover:bg-emerald-400 text-white rounded py-2 font-black uppercase text-xs transition-colors cursor-pointer"
+                      className="w-full h-9 flex items-center justify-center gap-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded py-2 font-black uppercase text-xs transition-colors cursor-pointer"
                     >
                       <RefreshCw className="w-4 h-4" />
                       {t.enigma.playAgain}
@@ -1121,13 +1164,13 @@ export default function App() {
                       }
                     }}
                     placeholder={t.enigma.placeholder}
-                    className="flex-1 bg-transparent border-none outline-none text-white text-xs sm:text-sm font-black font-mono tracking-wider placeholder-slate-600 uppercase focus:ring-0"
+                    className="flex-1 bg-transparent border-none outline-none text-white text-xs sm:text-sm font-black font-mono tracking-wider placeholder-muted uppercase focus:ring-0 focus-visible:outline-none"
                     maxLength={enigmaWord.word.length}
                   />
                   {enigmaInput.length > 0 && (
                     <button
                       onClick={submitEnigmaFullGuess}
-                      className="ml-2 px-2.5 py-1 text-xs bg-emerald-500 text-white font-black hover:bg-emerald-400 uppercase tracking-wider rounded transition-colors active:scale-95 cursor-pointer"
+                      className="ml-2 px-2.5 py-1 text-xs bg-emerald-700 text-white font-black hover:bg-emerald-800 uppercase tracking-wider rounded transition-colors active:scale-95 cursor-pointer"
                     >
                       {t.common.confirm}
                     </button>
@@ -1353,13 +1396,13 @@ export default function App() {
                       }
                     }}
                     placeholder={t.survival.placeholder}
-                    className="flex-1 bg-transparent border-none outline-none text-white text-xs sm:text-sm font-black font-mono tracking-wider placeholder-slate-600 uppercase focus:ring-0"
+                    className="flex-1 bg-transparent border-none outline-none text-white text-xs sm:text-sm font-black font-mono tracking-wider placeholder-muted uppercase focus:ring-0 focus-visible:outline-none"
                     maxLength={survivalWord.word.length}
                   />
                   {survivalInput.length > 0 && (
                     <button
                       onClick={submitSurvivalFullGuess}
-                      className="ml-2 px-2.5 py-1 text-xs bg-rose-500 text-white font-black hover:bg-rose-400 uppercase tracking-wider rounded transition-colors active:scale-95 cursor-pointer"
+                      className="ml-2 px-2.5 py-1 text-xs bg-rose-700 text-white font-black hover:bg-rose-800 uppercase tracking-wider rounded transition-colors active:scale-95 cursor-pointer"
                     >
                       {t.common.confirm}
                     </button>
@@ -1384,7 +1427,7 @@ export default function App() {
                       {t.survival.lostText(survivalStreak, survivalWord.word)}
                       <button
                         onClick={startSurvivalGame}
-                        className="mt-2.5 w-full py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded font-black uppercase text-[11px] sm:text-xs transition-colors cursor-pointer block text-center"
+                        className="mt-2.5 w-full py-1.5 bg-rose-700 hover:bg-rose-800 text-white rounded font-black uppercase text-[11px] sm:text-xs transition-colors cursor-pointer block text-center"
                       >
                         {t.survival.tryAgain}
                       </button>
@@ -1443,6 +1486,7 @@ export default function App() {
           language={settings.language}
           gameMode={gameMode}
           wordLength={wordLength}
+          highContrast={settings.highContrast}
           triggerSound={triggerSound}
         />
 

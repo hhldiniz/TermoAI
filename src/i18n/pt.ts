@@ -82,6 +82,8 @@ const pt: Messages = {
     yellow: 'AMARELO',
     yellowDesc: 'A letra está na palavra, mas em outra posição.',
     gray: 'CINZA',
+    orange: 'LARANJA',
+    blue: 'AZUL',
     grayDesc: 'A letra não está na palavra.',
     enigmaRules: [
       'Adivinhe a palavra escondida usando a dica da categoria.',
@@ -111,7 +113,9 @@ const pt: Messages = {
     hardMode: 'Modo difícil',
     hardModeDesc: 'Letras reveladas (verdes e amarelas) devem ser usadas nos próximos palpites.',
     console: 'Console do motor',
-    consoleDesc: 'Mostra um painel com as mensagens internas do jogo.'
+    consoleDesc: 'Mostra um painel com as mensagens internas do jogo.',
+    highContrast: 'Modo daltônico',
+    highContrastDesc: 'Usa laranja e azul no lugar de verde e amarelo.'
   },
 
   stats: {
@@ -130,6 +134,14 @@ const pt: Messages = {
     title: 'Console do motor',
     empty: 'Nenhuma mensagem ainda.',
     clear: 'Limpar'
+  },
+
+  a11y: {
+    help: 'Como jogar',
+    backspace: 'Apagar letra',
+    enter: 'Enviar palpite',
+    status: { correct: 'correta', present: 'na palavra, posição errada', incorrect: 'não está na palavra', empty: '' },
+    guessResult: (row, letters) => `Palpite ${row}: ${letters}.`
   },
 
   log: {

@@ -45,4 +45,5 @@ export interface GameSettings {
   wordLength: WordLength; // Classic mode word length
   category: string; // Classic mode category filter ('all' for any)
   showConsole: boolean; // Optional engine log console
+  highContrast: boolean; // Color-blind friendly palette (orange/blue)
 }
