@@ -1,5 +1,11 @@
 export type GameStatus = 'playing' | 'won' | 'lost';
 
+export type GameMode = 'menu' | 'standard' | 'enigma' | 'survival';
+
+export type SoundType = 'click' | 'flip' | 'win' | 'lose' | 'error';
+
+export type LogType = 'system' | 'info' | 'success' | 'warning' | 'token';
+
 export type LetterStatus = 'empty' | 'incorrect' | 'present' | 'correct';
 
 export interface LetterEvaluation {
@@ -14,7 +20,7 @@ export interface GuessAttempt {
 
 export interface LLMLog {
   timestamp: string;
-  type: 'system' | 'info' | 'success' | 'warning' | 'token';
+  type: LogType;
   message: string;
 }
 
@@ -33,6 +39,8 @@ export interface GameStats {
   maxStreak: number;
   guessesDistribution: number[]; // Index 0 represents 1 guess, 1 for 2, etc. (size 6)
   lastPlayedDate?: string;
+  enigma: { played: number; won: number; bestScore: number };
+  survival: { played: number; bestStreak: number };
 }
 
 export type WordLength = 4 | 5 | 6;

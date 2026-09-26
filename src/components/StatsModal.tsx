@@ -10,7 +10,6 @@ interface StatsModalProps {
   stats: GameStats;
   language: 'pt' | 'en' | 'es';
   onResetStats: () => void;
-  isGameFinished: boolean;
   onNewGame: () => void;
   triggerSound: (type: 'click' | 'flip' | 'win' | 'lose' | 'error') => void;
 }
@@ -21,7 +20,6 @@ export default function StatsModal({
   stats,
   language,
   onResetStats,
-  isGameFinished,
   onNewGame,
   triggerSound
 }: StatsModalProps) {
@@ -50,7 +48,7 @@ export default function StatsModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="stats-modal-title"
-        className="w-full max-w-sm bg-surface border border-line rounded p-4 sm:p-6 shadow-xl relative flex flex-col gap-5 select-none"
+        className="w-full max-w-sm max-h-full overflow-y-auto bg-surface border border-line rounded p-4 sm:p-6 shadow-xl relative flex flex-col gap-5 select-none"
       >
         {/* Close button */}
         <button
@@ -67,7 +65,8 @@ export default function StatsModal({
           <h2 id="stats-modal-title" className="text-sm font-black text-white uppercase tracking-widest">{labelTitle}</h2>
         </div>
 
-        {/* Numeric KPI Grid */}
+        {/* Classic */}
+        <h3 className="text-[11px] uppercase tracking-[0.2em] text-emerald-500 font-black -mb-3">{t.modes.classic}</h3>
         <div className="grid grid-cols-4 gap-2 text-center py-1">
           <div className="bg-app px-1 py-2.5 rounded border border-line min-w-0">
             <p className="text-xl font-black text-white font-mono leading-none mb-1">{totalGames}</p>
@@ -121,6 +120,21 @@ export default function StatsModal({
           </div>
         </div>
 
+        {/* Enigma and Survival */}
+        <div className="grid grid-cols-2 gap-2 text-left">
+          <div id="stats-enigma" className="bg-app p-2.5 rounded border border-line flex flex-col gap-0.5">
+            <h3 className="text-[11px] uppercase tracking-wider text-emerald-500 font-black mb-1 break-words">{t.modes.enigma}</h3>
+            <StatLine label={labelPlayed} value={stats.enigma.played} />
+            <StatLine label={t.stats.won} value={stats.enigma.won} />
+            <StatLine label={t.stats.bestScore} value={stats.enigma.bestScore} />
+          </div>
+          <div id="stats-survival" className="bg-app p-2.5 rounded border border-line flex flex-col gap-0.5">
+            <h3 className="text-[11px] uppercase tracking-wider text-rose-400 font-black mb-1 break-words">{t.modes.survival}</h3>
+            <StatLine label={t.stats.runs} value={stats.survival.played} />
+            <StatLine label={t.stats.bestStreak} value={stats.survival.bestStreak} />
+          </div>
+        </div>
+
         {/* Modal quick options footer */}
         <div className="flex flex-col sm:flex-row gap-2 mt-2 pt-4 border-t border-line">
           {/* Restart / New Game button */}
@@ -151,5 +165,14 @@ export default function StatsModal({
         </div>
       </div>
     </div>
+  );
+}
+
+function StatLine({ label, value }: { label: string; value: number }) {
+  return (
+    <p className="flex justify-between gap-2 text-xs text-muted font-bold">
+      <span>{label}</span>
+      <span className="text-white font-mono">{value}</span>
+    </p>
   );
 }

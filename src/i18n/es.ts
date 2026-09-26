@@ -29,7 +29,7 @@ const es: Messages = {
     enigmaBadge: '3 minutos',
     enigmaDesc: 'Adivina una palabra larga con la pista. Revelar letras cuesta puntos, y el tiempo corre.',
     survivalBadge: '3 vidas',
-    survivalDesc: 'Acierta tantas palabras seguidas como puedas con la pista. Cada error cuesta una de las 3 vidas.',
+    survivalDesc: 'Acierta tantas palabras seguidas como puedas. Tienes 3 intentos por palabra; agotarlos cuesta una de las 3 vidas.',
     language: 'Idioma:',
     switchLanguage: 'Cambiar idioma'
   },
@@ -43,7 +43,10 @@ const es: Messages = {
     onlyLetters: '¡Usa solo letras!',
     notInList: '¡Palabra no válida!',
     letterMustBe: (pos, char) => `¡La ${pos}.ª letra debe ser ${char}!`,
-    mustContain: (char) => `¡El intento debe contener ${char}!`
+    mustContain: (char) => `¡El intento debe contener ${char}!`,
+    share: 'Compartir',
+    copied: '¡Resultado copiado!',
+    shareTitle: (result) => `TermoAI ${result}`
   },
 
   enigma: {
@@ -63,7 +66,9 @@ const es: Messages = {
     solvedCount: (n) => `${n} ${n === 1 ? 'acierto' : 'aciertos'}`,
     nextWordIn: 'SIGUIENTE PALABRA EN...',
     placeholder: 'EJ.: ORDENADOR',
-    wrongGuess: (lives) => `¡Incorrecto! ${lives === 1 ? 'Queda 1 vida' : `Quedan ${lives} vidas`}. Cargando la siguiente palabra...`,
+    wrongGuess: (lives) => `¡Sin intentos! ${lives === 1 ? 'Queda 1 vida' : `Quedan ${lives} vidas`}. Cargando la siguiente palabra...`,
+    wrongAttempt: (tries) => `¡Casi! ${tries === 1 ? 'Queda 1 intento' : `Quedan ${tries} intentos`} para esta palabra. Las letras en su posición ya se muestran.`,
+    tries: 'Intentos:',
     gameOverMessage: (word) => `¡Fin del juego! La palabra era ${word}`,
     correctTitle: '¡CORRECTO!',
     loadingNext: 'Cargando la siguiente palabra...',
@@ -94,8 +99,9 @@ const es: Messages = {
     ],
     survivalRules: [
       'Adivina la palabra oculta usando la pista de la categoría.',
-      'Tienes un intento por palabra y empiezas con 3 vidas.',
-      'Cada error cuesta una vida. ¡Acierta tantas palabras seguidas como puedas!'
+      'Tienes 3 intentos por palabra y empiezas con 3 vidas.',
+      'Un intento fallido revela las letras que pusiste en su posición.',
+      'Agotar los 3 intentos de una palabra cuesta una vida. ¡Acierta tantas palabras seguidas como puedas!'
     ]
   },
 
@@ -127,7 +133,18 @@ const es: Messages = {
     distribution: 'Distribución de intentos',
     newGame: 'Nuevo juego',
     reset: 'Restablecer',
-    resetConfirm: '¿Seguro que quieres borrar todas las estadísticas guardadas?'
+    resetConfirm: '¿Seguro que quieres borrar todas las estadísticas guardadas?',
+    won: 'Victorias',
+    bestScore: 'Mejor puntuación',
+    runs: 'Partidas',
+    bestStreak: 'Mejor racha'
+  },
+
+  confirm: {
+    title: '¿Salir de este juego?',
+    body: 'Se perderá el progreso de este juego.',
+    leave: 'Salir',
+    stay: 'Seguir jugando'
   },
 
   console: {

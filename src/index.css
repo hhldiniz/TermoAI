@@ -75,10 +75,12 @@
   --color-present: #1f6feb;
 }
 
-/* Visible focus ring for keyboard users */
-:focus-visible {
-  outline: 2px solid var(--color-emerald-400);
-  outline-offset: 2px;
+/* Visible focus ring for keyboard users (in the base layer so utilities can override it) */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-emerald-400);
+    outline-offset: 2px;
+  }
 }
 
 /* Visually hidden but read by screen readers */

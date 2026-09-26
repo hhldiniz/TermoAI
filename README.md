@@ -26,3 +26,12 @@ The workflow in `.github/workflows/deploy-pages.yml` builds the app and publishe
 One-time setup: in **Settings → Pages**, set **Source** to **GitHub Actions**.
 
 The site will be available at `https://<owner>.github.io/<repo>/`.
+
+## Development
+
+- `npm run dev`: start the dev server
+- `npm test`: run the unit tests (game rules in `src/game/`)
+- `npm run lint`: type-check
+- `npm run build:dictionaries`: regenerate the word lists in `src/dictionaries/`
+
+Code layout: `src/App.tsx` is the app shell (settings, stats, dialogs, mode switching); each game mode lives in `src/modes/`; UI text is in `src/i18n/`.
