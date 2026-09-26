@@ -80,6 +80,8 @@ const en = {
     yellow: 'YELLOW',
     yellowDesc: 'The letter is in the word but in a different spot.',
     gray: 'GRAY',
+    orange: 'ORANGE',
+    blue: 'BLUE',
     grayDesc: 'The letter is not in the word.',
     enigmaRules: [
       'Guess the hidden word using the category clue.',
@@ -109,7 +111,9 @@ const en = {
     hardMode: 'Hard mode',
     hardModeDesc: 'Revealed letters (green and yellow) must be used in later guesses.',
     console: 'Engine console',
-    consoleDesc: "Shows a panel with the game's internal messages."
+    consoleDesc: "Shows a panel with the game's internal messages.",
+    highContrast: 'Color-blind mode',
+    highContrastDesc: 'Uses orange and blue instead of green and yellow.'
   },
 
   stats: {
@@ -128,6 +132,14 @@ const en = {
     title: 'Engine console',
     empty: 'No messages yet.',
     clear: 'Clear'
+  },
+
+  a11y: {
+    help: 'How to play',
+    backspace: 'Delete letter',
+    enter: 'Submit guess',
+    status: { correct: 'correct', present: 'in the word, wrong spot', incorrect: 'not in the word', empty: '' } as Record<'correct' | 'present' | 'incorrect' | 'empty', string>,
+    guessResult: (row: number, letters: string) => `Guess ${row}: ${letters}.`
   },
 
   log: {

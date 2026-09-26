@@ -2,6 +2,7 @@ import React from 'react';
 import { RefreshCw, BarChart3, TrendingUp, X, Sparkles, Trophy } from 'lucide-react';
 import { GameStats } from '../types';
 import { getMessages } from '../i18n';
+import { useDialog } from '../useDialog';
 
 interface StatsModalProps {
   isOpen: boolean;
@@ -24,6 +25,7 @@ export default function StatsModal({
   onNewGame,
   triggerSound
 }: StatsModalProps) {
+  const dialogRef = useDialog<HTMLDivElement>(isOpen, onClose);
   if (!isOpen) return null;
 
   const t = getMessages(language);
@@ -44,12 +46,17 @@ export default function StatsModal({
     <div id="stats-modal-backdrop" className="absolute inset-0 bg-app/90 flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
       <div 
         id="stats-modal-content"
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="stats-modal-title"
         className="w-full max-w-sm bg-surface border border-line rounded p-4 sm:p-6 shadow-xl relative flex flex-col gap-5 select-none"
       >
         {/* Close button */}
-        <button 
+        <button
+          aria-label={t.common.close} 
           onClick={() => { triggerSound('click'); onClose(); }}
-          className="absolute right-4 top-4 text-muted hover:text-white p-1 rounded hover:bg-line transition-colors cursor-pointer"
+          className="absolute right-2 top-2 w-11 h-11 flex items-center justify-center text-muted hover:text-white rounded hover:bg-line transition-colors cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
@@ -57,7 +64,7 @@ export default function StatsModal({
         {/* Title and Icon */}
         <div className="flex items-center gap-2 border-b border-line pb-3">
           <BarChart3 className="w-5 h-5 text-emerald-500" />
-          <h2 className="text-sm font-black text-white uppercase tracking-widest">{labelTitle}</h2>
+          <h2 id="stats-modal-title" className="text-sm font-black text-white uppercase tracking-widest">{labelTitle}</h2>
         </div>
 
         {/* Numeric KPI Grid */}
@@ -123,7 +130,7 @@ export default function StatsModal({
               onNewGame();
               onClose();
             }}
-            className="flex-1 bg-white text-black hover:bg-emerald-500 hover:text-white hover:border-emerald-500 border border-transparent font-black text-xs uppercase tracking-widest py-3 px-4 rounded transition-colors duration-200 cursor-pointer flex items-center justify-center gap-1.5"
+            className="flex-1 bg-white text-black hover:bg-emerald-700 hover:text-white hover:border-emerald-700 border border-transparent font-black text-xs uppercase tracking-widest py-3 px-4 rounded transition-colors duration-200 cursor-pointer flex items-center justify-center gap-1.5"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             {labelNewGame}

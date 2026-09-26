@@ -82,6 +82,8 @@ const es: Messages = {
     yellow: 'AMARILLO',
     yellowDesc: 'La letra está en la palabra, pero en una posición diferente.',
     gray: 'GRIS',
+    orange: 'NARANJA',
+    blue: 'AZUL',
     grayDesc: 'La letra no está en la palabra.',
     enigmaRules: [
       'Adivina la palabra oculta usando la pista de la categoría.',
@@ -111,7 +113,9 @@ const es: Messages = {
     hardMode: 'Modo difícil',
     hardModeDesc: 'Las letras reveladas (verdes y amarillas) deben usarse en los siguientes intentos.',
     console: 'Consola del motor',
-    consoleDesc: 'Muestra un panel con los mensajes internos del juego.'
+    consoleDesc: 'Muestra un panel con los mensajes internos del juego.',
+    highContrast: 'Modo daltónico',
+    highContrastDesc: 'Usa naranja y azul en lugar de verde y amarillo.'
   },
 
   stats: {
@@ -130,6 +134,14 @@ const es: Messages = {
     title: 'Consola del motor',
     empty: 'Aún no hay mensajes.',
     clear: 'Borrar'
+  },
+
+  a11y: {
+    help: 'Cómo jugar',
+    backspace: 'Borrar letra',
+    enter: 'Enviar intento',
+    status: { correct: 'correcta', present: 'en la palabra, posición incorrecta', incorrect: 'no está en la palabra', empty: '' },
+    guessResult: (row, letters) => `Intento ${row}: ${letters}.`
   },
 
   log: {

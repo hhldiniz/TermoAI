@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, HelpCircle } from 'lucide-react';
 import { getMessages } from '../i18n';
+import { useDialog } from '../useDialog';
 
 interface HelpModalProps {
   isOpen: boolean;
@@ -8,6 +9,7 @@ interface HelpModalProps {
   language: 'pt' | 'en' | 'es';
   gameMode: 'menu' | 'standard' | 'enigma' | 'survival';
   wordLength: number;
+  highContrast: boolean;
   triggerSound: (type: 'click' | 'flip' | 'win' | 'lose' | 'error') => void;
 }
 
@@ -17,8 +19,10 @@ export default function HelpModal({
   language,
   gameMode,
   wordLength,
+  highContrast,
   triggerSound
 }: HelpModalProps) {
+  const dialogRef = useDialog<HTMLDivElement>(isOpen, onClose);
   if (!isOpen) return null;
 
   const t = getMessages(language);
@@ -30,13 +34,13 @@ export default function HelpModal({
       </p>
       <div className="flex flex-col gap-2 font-black uppercase tracking-wider text-[11px]">
         <div className="flex items-center gap-2">
-          <span className="w-20 shrink-0 text-center bg-correct text-white rounded py-0.5">{t.help.green}</span>
+          <span className="w-20 shrink-0 text-center bg-correct text-white rounded py-0.5">{highContrast ? t.help.orange : t.help.green}</span>
           <span className="text-muted font-semibold tracking-tight normal-case">
             {t.help.greenDesc}
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-20 shrink-0 text-center bg-present text-white rounded py-0.5">{t.help.yellow}</span>
+          <span className="w-20 shrink-0 text-center bg-present text-white rounded py-0.5">{highContrast ? t.help.blue : t.help.yellow}</span>
           <span className="text-muted font-semibold tracking-tight normal-case">
             {t.help.yellowDesc}
           </span>
@@ -73,6 +77,7 @@ export default function HelpModal({
     <div id="help-modal-backdrop" className="absolute inset-0 bg-app/90 flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
       <div
         id="help-modal-content"
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="help-modal-title"
@@ -81,7 +86,7 @@ export default function HelpModal({
         <button
           onClick={() => { triggerSound('click'); onClose(); }}
           aria-label={t.common.close}
-          className="absolute right-4 top-4 text-muted hover:text-white p-1 rounded hover:bg-line transition-colors cursor-pointer"
+          className="absolute right-2 top-2 w-11 h-11 flex items-center justify-center text-muted hover:text-white rounded hover:bg-line transition-colors cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>

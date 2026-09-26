@@ -1,6 +1,7 @@
 import React from 'react';
 import { Delete } from 'lucide-react';
 import { LetterStatus } from '../types';
+import { getMessages } from '../i18n';
 
 interface KeyboardProps {
   onKeyPress: (key: string) => void;
@@ -30,7 +31,7 @@ export default function Keyboard({
 
   const getKeyClass = (key: string) => {
     // Normal base styling for keyboard actions
-    const base = "h-[38px] sm:h-12 flex-1 rounded text-sm sm:text-xs font-black transition-all duration-150 flex items-center justify-center select-none active:scale-95 touch-none ";
+    const base = "h-11 sm:h-12 flex-1 rounded text-sm sm:text-xs font-black transition-all duration-150 flex items-center justify-center select-none active:scale-95 touch-none ";
     
     if (key === 'ENTER' || key === 'BACKSPACE') {
       return base + "bg-key hover:bg-key/90 text-white flex-[1.4] text-[11px] sm:text-xs";
@@ -48,6 +49,16 @@ export default function Keyboard({
       default:
         return base + "bg-key hover:bg-key/90 text-white";
     }
+  };
+
+  const t = getMessages(language);
+
+  // Spoken label: action name for Enter/Backspace, otherwise the letter plus what is known about it
+  const getKeyLabel = (key: string) => {
+    if (key === 'BACKSPACE') return t.a11y.backspace;
+    if (key === 'ENTER') return t.a11y.enter;
+    const status = letterStatuses[key];
+    return status && status !== 'empty' ? `${key}, ${t.a11y.status[status]}` : key;
   };
 
   const handleKeyClick = (key: string) => {
@@ -70,6 +81,7 @@ export default function Keyboard({
                 onClick={() => handleKeyClick(key)}
                 className={getKeyClass(key)}
                 type="button"
+                aria-label={getKeyLabel(key)}
               >
                 {key === 'BACKSPACE' ? (
                   <Delete className="w-4 h-4 text-slate-200" />

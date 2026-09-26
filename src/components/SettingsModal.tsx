@@ -3,6 +3,7 @@ import { Settings, Volume2, VolumeX, X } from 'lucide-react';
 import { GameSettings, WordLength } from '../types';
 import { getCategories } from '../categories';
 import { getMessages } from '../i18n';
+import { useDialog } from '../useDialog';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -21,6 +22,7 @@ export default function SettingsModal({
   language,
   triggerSound
 }: SettingsModalProps) {
+  const dialogRef = useDialog<HTMLDivElement>(isOpen, onClose);
   if (!isOpen) return null;
 
   const t = getMessages(language);
@@ -56,12 +58,17 @@ export default function SettingsModal({
     <div id="settings-modal-backdrop" className="absolute inset-0 bg-app/90 flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
       <div 
         id="settings-modal-content"
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="settings-modal-title"
         className="w-full max-w-sm max-h-full overflow-y-auto bg-surface border border-line rounded p-4 sm:p-6 shadow-xl relative flex flex-col gap-5 select-none"
       >
         {/* Close Button */}
-        <button 
+        <button
+          aria-label={t.common.close}
           onClick={() => { playSound('click'); onClose(); }}
-          className="absolute right-4 top-4 text-muted hover:text-white p-1 rounded hover:bg-line transition-colors cursor-pointer"
+          className="absolute right-2 top-2 w-11 h-11 flex items-center justify-center text-muted hover:text-white rounded hover:bg-line transition-colors cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
@@ -69,7 +76,7 @@ export default function SettingsModal({
         {/* Header Title */}
         <div className="flex items-center gap-2 border-b border-line pb-3">
           <Settings className="w-5 h-5 text-emerald-500" />
-          <h2 className="text-sm font-black text-white uppercase tracking-widest">{labelTitle}</h2>
+          <h2 id="settings-modal-title" className="text-sm font-black text-white uppercase tracking-widest">{labelTitle}</h2>
         </div>
 
         {/* Setting Controls */}
@@ -89,7 +96,8 @@ export default function SettingsModal({
                   playSound('click');
                   setSettings(p => ({ ...p, language: 'pt', category: p.language === 'pt' ? p.category : 'all' }));
                 }}
-                className={`px-3 py-1 rounded transition-colors font-bold uppercase ${settings.language === 'pt' ? 'bg-emerald-500 text-white' : 'text-muted hover:text-white'}`}
+                aria-pressed={settings.language === 'pt'}
+                className={`px-3 py-1 rounded transition-colors font-bold uppercase ${settings.language === 'pt' ? 'bg-emerald-700 text-white' : 'text-muted hover:text-white'}`}
               >
                 PT
               </button>
@@ -98,7 +106,8 @@ export default function SettingsModal({
                   playSound('click');
                   setSettings(p => ({ ...p, language: 'en', category: p.language === 'en' ? p.category : 'all' }));
                 }}
-                className={`px-3 py-1 rounded transition-colors font-bold uppercase ${settings.language === 'en' ? 'bg-emerald-500 text-white' : 'text-muted hover:text-white'}`}
+                aria-pressed={settings.language === 'en'}
+                className={`px-3 py-1 rounded transition-colors font-bold uppercase ${settings.language === 'en' ? 'bg-emerald-700 text-white' : 'text-muted hover:text-white'}`}
               >
                 EN
               </button>
@@ -107,7 +116,8 @@ export default function SettingsModal({
                   playSound('click');
                   setSettings(p => ({ ...p, language: 'es', category: p.language === 'es' ? p.category : 'all' }));
                 }}
-                className={`px-3 py-1 rounded transition-colors font-bold uppercase ${settings.language === 'es' ? 'bg-emerald-500 text-white' : 'text-muted hover:text-white'}`}
+                aria-pressed={settings.language === 'es'}
+                className={`px-3 py-1 rounded transition-colors font-bold uppercase ${settings.language === 'es' ? 'bg-emerald-700 text-white' : 'text-muted hover:text-white'}`}
               >
                 ES
               </button>
@@ -129,7 +139,7 @@ export default function SettingsModal({
                     setSettings(p => ({ ...p, wordLength: len }));
                   }}
                   aria-pressed={settings.wordLength === len}
-                  className={`px-3 py-1 rounded transition-colors font-bold ${settings.wordLength === len ? 'bg-emerald-500 text-white' : 'text-muted hover:text-white'}`}
+                  className={`px-3 py-1 rounded transition-colors font-bold ${settings.wordLength === len ? 'bg-emerald-700 text-white' : 'text-muted hover:text-white'}`}
                 >
                   {len}
                 </button>
@@ -169,6 +179,9 @@ export default function SettingsModal({
             </div>
             <button
               onClick={toggleSound}
+              role="switch"
+              aria-checked={settings.soundEnabled}
+              aria-label={labelSound}
               className={`p-1.5 rounded border transition-colors cursor-pointer ${
                 settings.soundEnabled 
                   ? 'bg-app border-emerald-500 text-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.15)]' 
@@ -190,7 +203,10 @@ export default function SettingsModal({
                 playSound('click');
                 setSettings(prev => ({ ...prev, autoRevealClue: !prev.autoRevealClue }));
               }}
-              className={`w-10 h-6 rounded-full p-0.5 transition-colors outline-none flex items-center cursor-pointer ${
+              role="switch"
+              aria-checked={settings.autoRevealClue}
+              aria-label={labelAutoClue}
+              className={`w-10 h-6 rounded-full p-0.5 transition-colors flex items-center cursor-pointer ${
                 settings.autoRevealClue ? 'bg-emerald-500 justify-end' : 'bg-line justify-start'
               }`}
             >
@@ -211,8 +227,33 @@ export default function SettingsModal({
                 playSound('click');
                 setSettings(prev => ({ ...prev, hardMode: !prev.hardMode }));
               }}
-              className={`w-10 h-6 rounded-full p-0.5 transition-colors outline-none flex items-center cursor-pointer ${
+              role="switch"
+              aria-checked={settings.hardMode}
+              aria-label={labelHardMode}
+              className={`w-10 h-6 rounded-full p-0.5 transition-colors flex items-center cursor-pointer ${
                 settings.hardMode ? 'bg-emerald-500 justify-end' : 'bg-line justify-start'
+              }`}
+            >
+              <span className="w-4 h-4 rounded-full shadow bg-white" />
+            </button>
+          </div>
+
+          {/* COLOR-BLIND MODE */}
+          <div className="flex items-center justify-between border-t border-line/40 pt-3">
+            <div className="flex flex-col gap-0.5 max-w-[75%]">
+              <span className="text-xs font-black text-white uppercase tracking-wider">{t.settings.highContrast}</span>
+              <span className="text-xs text-muted leading-normal">{t.settings.highContrastDesc}</span>
+            </div>
+            <button
+              onClick={() => {
+                playSound('click');
+                setSettings(prev => ({ ...prev, highContrast: !prev.highContrast }));
+              }}
+              role="switch"
+              aria-checked={settings.highContrast}
+              aria-label={t.settings.highContrast}
+              className={`w-10 h-6 rounded-full p-0.5 transition-colors flex items-center cursor-pointer ${
+                settings.highContrast ? 'bg-emerald-500 justify-end' : 'bg-line justify-start'
               }`}
             >
               <span className="w-4 h-4 rounded-full shadow bg-white" />
@@ -233,7 +274,7 @@ export default function SettingsModal({
               role="switch"
               aria-checked={settings.showConsole}
               aria-label={labelConsole}
-              className={`w-10 h-6 rounded-full p-0.5 transition-colors outline-none flex items-center cursor-pointer ${
+              className={`w-10 h-6 rounded-full p-0.5 transition-colors flex items-center cursor-pointer ${
                 settings.showConsole ? 'bg-emerald-500 justify-end' : 'bg-line justify-start'
               }`}
             >
