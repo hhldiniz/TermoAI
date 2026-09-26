@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { GameStatus, LetterEvaluation, LetterStatus, GameStats, GameSettings, LLMLog, WordData } from './types';
 import { generateWordOffline, normalizeText, getRandomLargeWord, LargeWordData } from './words';
 import { loadDictionary, isKnownWord } from './dictionary';
+import { getMessages, getHtmlLang } from './i18n';
 import { playSound } from './utils/audio';
 
 // Components
@@ -65,6 +66,12 @@ export default function App() {
 
   const isPt = settings.language === 'pt';
   const isEs = settings.language === 'es';
+  const t = getMessages(settings.language);
+
+  // Keep <html lang> in sync so screen readers and translators use the right language
+  useEffect(() => {
+    document.documentElement.lang = getHtmlLang(settings.language);
+  }, [settings.language]);
 
   // Play Sound helper safeguarding settings toggle
   const triggerSound = useCallback((type: 'click' | 'flip' | 'win' | 'lose' | 'error') => {
@@ -127,9 +134,9 @@ export default function App() {
     setSurvivalMessage(null);
     setIsSurvivalTransitioning(false);
     if (!isFresh) {
-      pushLog('system', isPt ? `Sobrevivência: Nova palavra carregada.` : `Survival: New word loaded.`);
+      pushLog('system', t.log.survivalNextWord);
     } else {
-      pushLog('system', isPt ? 'Arquitetura de Sobrevivência ativada. 3 Vidas restantes!' : 'Survival computing mode active. 3 Lives allocated!');
+      pushLog('system', t.log.survivalStarted);
     }
   };
 
@@ -145,10 +152,7 @@ export default function App() {
       setSurvivalInput('');
       setSurvivalMessage(null);
       setSurvivalStreak(prev => prev + 1);
-      pushLog('success', isPt 
-        ? `Incrível! Palavra correta! Sequência atual: ${survivalStreak + 1} acertos.`
-        : `Outstanding! Correct word! Current streak: ${survivalStreak + 1} solved.`
-      );
+      pushLog('success', t.log.survivalCorrect(survivalStreak + 1));
       
       setIsSurvivalTransitioning(true);
       // Auto transition to next word in 2.5 seconds
@@ -173,20 +177,11 @@ export default function App() {
         if (nextLives === 0) {
           setSurvivalStatus('lost');
           triggerSound('lose');
-          setSurvivalMessage(isPt ? `Fim de jogo! A palavra era ${survivalWord.word}` : isEs ? `¡Fin del juego! La palabra era ${survivalWord.word}` : `Game over! The word was ${survivalWord.word}`);
-          pushLog('warning', isPt
-            ? `Histórico de sobrevivência finalizado! Sequência obtida: ${survivalStreak} acertos.`
-            : `Survival sequence finished! Final streak: ${survivalStreak} solved.`
-          );
+          setSurvivalMessage(t.survival.gameOverMessage(survivalWord.word));
+          pushLog('warning', t.log.survivalOver(survivalStreak));
         } else {
-          setSurvivalMessage(isPt 
-            ? `Incorreto! Restam ${nextLives} vidas. Carregando próxima palavra...` 
-            : `Incorrect! ${nextLives} lives left. Loading next word...`
-          );
-          pushLog('info', isPt 
-            ? `Erro de digitação: [${cleanGuess}]. Restam ${nextLives} vidas.` 
-            : `Mispelled: [${cleanGuess}]. ${nextLives} lives remaining.`
-          );
+          setSurvivalMessage(t.survival.wrongGuess(nextLives));
+          pushLog('info', t.log.survivalWrong(cleanGuess, nextLives));
           
           setIsSurvivalTransitioning(true);
           // Auto transition to next word in 2.5 seconds
@@ -230,7 +225,7 @@ export default function App() {
     setEnigmaTimeLeft(180);
     setGameMode('enigma');
     triggerSound('click');
-    pushLog('system', isPt ? 'Nova palavra Enigma selecionada para desencriptação.' : 'New Enigma secret word selected for signal decrypting.');
+    pushLog('system', t.log.enigmaStarted);
   };
 
   const submitEnigmaFullGuess = () => {
@@ -244,17 +239,14 @@ export default function App() {
       setEnigmaRevealedLetters(enigmaWord.word.split(''));
       setEnigmaInput('');
       setEnigmaMessage(null);
-      pushLog('success', isPt 
-        ? `Parabéns! Enigma resolvido com sucesso! Pontuação Final: ${enigmaScore} pts.`
-        : `Congratulations! Decryption resolved with positive signal! Score: ${enigmaScore} pts.`
-      );
+      pushLog('success', t.log.enigmaWon(enigmaScore));
     } else {
       triggerSound('error');
       setEnigmaGuesses(prev => {
         if (prev.includes(cleanGuess)) return prev;
         return [...prev, cleanGuess];
       });
-      setEnigmaMessage(isPt ? 'Palpite incorreto! -15 Pontos.' : 'Incorrect full word answer! -15 pts.');
+      setEnigmaMessage(t.enigma.wrongGuess);
       setEnigmaScore(prev => Math.max(0, prev - 15));
       setEnigmaInput('');
       
@@ -269,12 +261,9 @@ export default function App() {
     if (gameMode === 'enigma' && enigmaStatus === 'playing' && enigmaScore <= 0) {
       setEnigmaStatus('lost');
       triggerSound('lose');
-      pushLog('warning', isPt 
-        ? `Insucesso! Pontuação esgotada para decodificação Enigma. A palavra era: ${enigmaWord?.word}` 
-        : `Decompiled zero energy! Word has not been successfully extracted: ${enigmaWord?.word}`
-      );
+      pushLog('warning', t.log.enigmaZeroScore(enigmaWord?.word ?? ''));
     }
-  }, [enigmaScore, enigmaStatus, gameMode, enigmaWord, isPt, triggerSound, pushLog]);
+  }, [enigmaScore, enigmaStatus, gameMode, enigmaWord, t, triggerSound, pushLog]);
 
   // Enigma Countdown Timer and Progressive Score Loss
   useEffect(() => {
@@ -288,10 +277,7 @@ export default function App() {
           clearInterval(intervalId);
           setEnigmaStatus('lost');
           triggerSound('lose');
-          pushLog('warning', isPt 
-            ? `Insucesso! O tempo limite de 3 minutos expirou para a decodificação Enigma. A palavra era: ${enigmaWord?.word}` 
-            : `Decryption timeout! The 3-minute limit expired. The secret word was: ${enigmaWord?.word}`
-          );
+          pushLog('warning', t.log.enigmaTimeout(enigmaWord?.word ?? ''));
           return 0;
         }
 
@@ -303,7 +289,7 @@ export default function App() {
           setEnigmaScore((prevScore) => {
             const nextScore = Math.max(1, prevScore - 1);
             if (nextScore === 1 && prevScore > 1) {
-              pushLog('token', isPt ? 'Alerta: Escore Enigma no nível crítico de 1 ponto!' : 'Alert: Enigma score reached critical level of 1 point!');
+              pushLog('token', t.log.enigmaCriticalScore);
             }
             return nextScore;
           });
@@ -314,7 +300,7 @@ export default function App() {
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, [gameMode, enigmaStatus, enigmaWord, isPt, triggerSound, pushLog, isAnyModalOpen]);
+  }, [gameMode, enigmaStatus, enigmaWord, t, triggerSound, pushLog, isAnyModalOpen]);
 
   const wordLength = activeWord ? activeWord.word.length : settings.wordLength;
 
@@ -327,13 +313,8 @@ export default function App() {
     setRevealedCount(0);
     setErrorMessage(null);
     setActiveWord(solvedWord);
-    pushLog('success', isPt
-      ? `Nova palavra escolhida: ${solvedWord.word.length} letras, categoria ${solvedWord.category}.`
-      : isEs
-        ? `Nueva palabra elegida: ${solvedWord.word.length} letras, categoría ${solvedWord.category}.`
-        : `New word picked: ${solvedWord.word.length} letters, category ${solvedWord.category}.`
-    );
-  }, [settings.language, settings.category, settings.wordLength, isPt, isEs, pushLog]);
+    pushLog('success', t.log.wordPicked(solvedWord.word.length, solvedWord.category));
+  }, [settings.language, settings.category, settings.wordLength, t, pushLog]);
 
   // Pick a word on startup, and again when the word settings change if no guess was made yet
   useEffect(() => {
@@ -410,21 +391,21 @@ export default function App() {
 
     // Validate size
     if (normalizedGuess.length !== wordLength) {
-      showAlert(isPt ? `Digite ${wordLength} letras!` : isEs ? `¡Introduce ${wordLength} letras!` : `Guess must be exactly ${wordLength} letters!`);
+      showAlert(t.classic.typeLetters(wordLength));
       triggerErrorShaking();
       return;
     }
 
     // Validate standard alpha characters
     if (!/^[A-ZÇÑ]+$/.test(normalizedGuess) || normalizedGuess.length !== wordLength) {
-      showAlert(isPt ? 'Use apenas letras normais!' : isEs ? '¡Utiliza solo letras válidas!' : 'Only valid alphabet characters are accepted!');
+      showAlert(t.classic.onlyLetters);
       triggerErrorShaking();
       return;
     }
 
     // Dictionary validation (skipped only while the word list is still loading)
     if (isKnownWord(normalizedGuess, settings.language) === false) {
-      showAlert(isPt ? 'Palavra não aceita!' : isEs ? '¡Palabra no válida!' : 'Not in word list!');
+      showAlert(t.classic.notInList);
       triggerErrorShaking();
       return;
     }
@@ -435,11 +416,7 @@ export default function App() {
       for (let i = 0; i < wordLength; i++) {
         // Correct position condition
         if (lastEval[i].status === 'correct' && normalizedGuess[i] !== lastEval[i].char) {
-          showAlert(isPt 
-            ? `A ${i+1}ª letra deve ser ${lastEval[i].char}!` 
-            : isEs
-              ? `¡La ${i+1}ª letra debe ser ${lastEval[i].char}!`
-              : `Letter ${i+1} must be ${lastEval[i].char}!`);
+          showAlert(t.classic.letterMustBe(i + 1, lastEval[i].char));
           triggerErrorShaking();
           return;
         }
@@ -455,11 +432,7 @@ export default function App() {
       for (const [char, required] of Object.entries(requiredCounts)) {
         const used = normalizedGuess.split('').filter(c => c === char).length;
         if (used < required) {
-          showAlert(isPt
-            ? `O palpite deve conter ${char}!`
-            : isEs
-              ? `¡El intento debe contener ${char}!`
-              : `Guess must contain ${char}!`);
+          showAlert(t.classic.mustContain(char));
           triggerErrorShaking();
           return;
         }
@@ -479,10 +452,7 @@ export default function App() {
     if (isMatch) {
       setGameStatus('won');
       triggerSound('win');
-      pushLog('success', isPt 
-        ? `Incrível! Palavra encontrada na tentativa ${nextGuesses.length}/6.` 
-        : `Outstanding performance! Match resolved in attempt ${nextGuesses.length}/6.`
-      );
+      pushLog('success', t.log.classicWon(nextGuesses.length));
       
       // Update persistent stats
       setStats(prev => {
@@ -511,10 +481,7 @@ export default function App() {
     } else if (nextGuesses.length >= 6) {
       setGameStatus('lost');
       triggerSound('lose');
-      pushLog('warning', isPt 
-        ? `Palpites esgotados! A palavra secreta era: ${activeWord.word}` 
-        : `Attempts exhausted! The secret word was: ${activeWord.word}`
-      );
+      pushLog('warning', t.log.classicLost(activeWord.word));
 
       setStats(prev => ({
         ...prev,
@@ -529,10 +496,7 @@ export default function App() {
       // Game continues. Give visual hints if auto reveal conditions match
       if (settings.autoRevealClue && nextGuesses.length === 3) {
         setRevealedCount(1); // Auto unlock clue
-        pushLog('info', isPt 
-          ? `[Auto-Dica]: Clue revelado para apoio cognitivo.` 
-          : `[Auto-Hint]: Semantic clue unlocked for cognitive alignment.`
-        );
+        pushLog('info', t.log.autoHint);
       }
     }
   };
@@ -694,10 +658,10 @@ export default function App() {
   };
 
   const modeName = gameMode === 'enigma'
-    ? 'Enigma'
+    ? t.modes.enigma
     : gameMode === 'survival'
-      ? (isPt ? 'Sobrevivência' : isEs ? 'Supervivencia' : 'Survival')
-      : (isPt ? 'Clássico' : isEs ? 'Clásico' : 'Classic');
+      ? t.modes.survival
+      : t.modes.classic;
 
   // Starts a new round of whichever mode is active
   const startNewGameForCurrentMode = () => {
@@ -722,7 +686,7 @@ export default function App() {
     };
     setStats(freshStats);
     localStorage.setItem('termo_stats', JSON.stringify(freshStats));
-    pushLog('system', isPt ? 'Zera histórico local realizado.' : 'Wiped and cleared local cache records.');
+    pushLog('system', t.log.statsReset);
   };
 
   return (
@@ -738,7 +702,8 @@ export default function App() {
                 id="header-btn-home"
                 onClick={() => { triggerSound('click'); setGameMode('menu'); }}
                 className="p-1 px-1.5 text-emerald-400 hover:text-emerald-300 hover:bg-line active:scale-95 rounded transition-all mr-1 flex items-center justify-center cursor-pointer"
-                title={isPt ? 'Voltar para o Menu' : 'Back to Menu'}
+                title={t.common.backToMenu}
+                aria-label={t.common.backToMenu}
               >
                 <svg className="w-5 h-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6 pointer-events-none" />
@@ -761,7 +726,8 @@ export default function App() {
                 id="header-btn-refresh"
                 onClick={() => { triggerSound('click'); generateNewWord(); }}
                 className="p-1 text-slate-400 hover:text-white hover:bg-line active:scale-95 rounded transition-all cursor-pointer"
-                title={isPt ? 'Nova palavra' : isEs ? 'Nueva palabra' : 'New word'}
+                title={t.common.newWord}
+                aria-label={t.common.newWord}
               >
                 <RefreshCw className="w-4 h-4 sm:w-4.5 sm:h-4.5 pointer-events-none" />
               </button>
@@ -773,7 +739,8 @@ export default function App() {
                 id="header-btn-enigma-refresh"
                 onClick={() => { triggerSound('click'); startEnigmaGame(); }}
                 className="p-1 text-slate-400 hover:text-white hover:bg-line active:scale-95 rounded transition-all cursor-pointer"
-                title={isPt ? 'Nova palavra' : isEs ? 'Nueva palabra' : 'New word'}
+                title={t.common.newWord}
+                aria-label={t.common.newWord}
               >
                 <RefreshCw className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-emerald-400 pointer-events-none" />
               </button>
@@ -836,7 +803,7 @@ export default function App() {
               TERMO<span className="text-emerald-500">AI</span>
             </h2>
             <p className="text-sm text-slate-400 mb-6 sm:mb-8 max-w-[300px]">
-              {isPt ? 'Escolha um modo de jogo.' : isEs ? 'Elige un modo de juego.' : 'Choose a game mode.'}
+              {t.menu.subtitle}
             </p>
 
             {/* Choices */}
@@ -846,24 +813,20 @@ export default function App() {
                 onClick={() => {
                   triggerSound('click');
                   setGameMode('standard');
-                  pushLog('system', isPt ? 'Modo Clássico selecionado.' : isEs ? 'Modo Clásico seleccionado.' : 'Classic mode selected.');
+                  pushLog('system', t.log.classicSelected);
                 }}
                 className="w-full p-3 sm:p-4 rounded-xl bg-surface border border-line hover:border-emerald-500/50 hover:bg-surface-2 text-left transition-all duration-300 active:scale-[0.98] group flex flex-col cursor-pointer"
               >
                 <div className="flex items-center justify-between w-full mb-1">
                   <span className="font-extrabold text-xs sm:text-sm text-white group-hover:text-emerald-400 transition-colors">
-                    {isPt ? '⚡ Clássico' : isEs ? '⚡ Clásico' : '⚡ Classic'}
+                    ⚡ {t.modes.classic}
                   </span>
                   <span className="text-[11px] sm:text-xs font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    {isPt ? '6 tentativas' : isEs ? '6 intentos' : '6 tries'}
+                    {t.menu.classicBadge}
                   </span>
                 </div>
                 <p className="text-[13px] sm:text-sm text-slate-400 leading-snug">
-                  {isPt 
-                    ? 'Descubra a palavra de 4, 5 ou 6 letras. Cores mostram o quão perto você está, e há uma dica se precisar.'
-                    : isEs
-                      ? 'Adivina la palabra de 4, 5 o 6 letras. Los colores muestran lo cerca que estás, y hay una pista si la necesitas.'
-                      : 'Guess the 4, 5 or 6-letter word. Colors show how close you are, and there is a hint if you need it.'}
+                  {t.menu.classicDesc}
                 </p>
               </button>
 
@@ -876,18 +839,14 @@ export default function App() {
               >
                 <div className="flex items-center justify-between w-full mb-1">
                   <span className="font-extrabold text-xs sm:text-sm text-white group-hover:text-emerald-400 transition-colors">
-                    🔎 Enigma
+                    🔎 {t.modes.enigma}
                   </span>
                   <span className="text-[11px] sm:text-xs font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    {isPt ? '3 minutos' : isEs ? '3 minutos' : '3 minutes'}
+                    {t.menu.enigmaBadge}
                   </span>
                 </div>
                 <p className="text-[13px] sm:text-sm text-slate-400 leading-snug">
-                  {isPt 
-                    ? 'Descubra uma palavra longa pela dica. Revelar letras custa pontos, e o tempo está correndo.'
-                    : isEs
-                      ? 'Adivina una palabra larga con la pista. Revelar letras cuesta puntos, y el tiempo corre.'
-                      : 'Guess a long word from its clue. Revealing letters costs points, and the clock is ticking.'}
+                  {t.menu.enigmaDesc}
                 </p>
               </button>
 
@@ -901,25 +860,21 @@ export default function App() {
                 <div className="flex items-center justify-between w-full mb-1">
                   <span className="font-extrabold text-xs sm:text-sm text-white group-hover:text-rose-500 transition-colors flex items-center gap-1.5">
                     <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500 shrink-0" />
-                    {isPt ? 'Sobrevivência' : isEs ? 'Supervivencia' : 'Survival'}
+                    {t.modes.survival}
                   </span>
                   <span className="text-[11px] sm:text-xs font-mono px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">
-                    {isPt ? '3 vidas' : isEs ? '3 vidas' : '3 lives'}
+                    {t.menu.survivalBadge}
                   </span>
                 </div>
                 <p className="text-[13px] sm:text-sm text-slate-400 leading-snug">
-                  {isPt 
-                    ? 'Acerte o máximo de palavras seguidas pela dica. Cada erro custa uma das 3 vidas.'
-                    : isEs
-                      ? 'Acierta tantas palabras seguidas como puedas con la pista. Cada error cuesta una de las 3 vidas.'
-                      : 'Solve as many words in a row as you can from their clues. Each miss costs one of 3 lives.'}
+                  {t.menu.survivalDesc}
                 </p>
               </button>
             </div>
 
             {/* Language indicator on the fly */}
             <div className="mt-6 sm:mt-8 flex gap-2 items-center text-xs text-slate-500 bg-surface py-1.5 px-3 rounded-full border border-line">
-              <span>{isPt ? 'Idioma:' : isEs ? 'Idioma:' : 'Language:'}</span>
+              <span>{t.menu.language}</span>
               <button 
                 onClick={() => {
                   triggerSound('click');
@@ -930,9 +885,9 @@ export default function App() {
                   }));
                 }}
                 className="font-black text-emerald-400 hover:underline hover:text-white pointer-events-auto cursor-pointer"
-                title={isPt ? 'Mudar Idioma' : isEs ? 'Cambiar Idioma' : 'Switch Language'}
+                title={t.menu.switchLanguage}
               >
-                {settings.language === 'pt' ? 'Português (BR)' : settings.language === 'es' ? 'Español (ES)' : 'English (US)'}
+                {t.langName}
               </button>
             </div>
 
@@ -949,7 +904,7 @@ export default function App() {
                   {/* Category indicator badges */}
                   <div className="flex gap-2 items-center mb-0.5 sm:mb-1">
                     <span className="text-[11px] sm:text-xs font-bold text-emerald-500 uppercase tracking-widest">
-                      {isPt ? 'Categoria:' : isEs ? 'Categoría:' : 'Category:'} {isPt && activeWord.category === 'Nature' ? 'Natureza' : activeWord.category}
+                      {t.common.category} {isPt && activeWord.category === 'Nature' ? 'Natureza' : activeWord.category}
                     </span>
                     <span className={`text-[11px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider border ${
                       activeWord.difficulty === 'fácil' 
@@ -958,14 +913,14 @@ export default function App() {
                           ? 'bg-surface border-amber-500/30 text-amber-500' 
                           : 'bg-surface border-rose-500/30 text-rose-400'
                     }`}>
-                      {activeWord.difficulty}
+                      {t.common.difficulty[activeWord.difficulty]}
                     </span>
                   </div>
 
                   {/* Clue revealing or solved text */}
                   {revealedCount > 0 ? (
                     <p className="text-[13px] sm:text-sm text-slate-100 font-bold leading-snug mt-0.5 sm:mt-1 animate-in fade-in slide-in-from-top-1 px-1.5">
-                      <span className="font-extrabold text-emerald-500 not-italic uppercase tracking-widest block text-[11px] mb-0">{isPt ? 'Dica:' : isEs ? 'Pista:' : 'Hint:'}</span>
+                      <span className="font-extrabold text-emerald-500 not-italic uppercase tracking-widest block text-[11px] mb-0">{t.common.hint}</span>
                       "{activeWord.clue}"
                     </p>
                   ) : (
@@ -974,12 +929,12 @@ export default function App() {
                       onClick={() => {
                         triggerSound('click');
                         setRevealedCount(1);
-                        pushLog('info', isPt ? 'Dica revelada.' : isEs ? 'Pista revelada.' : 'Hint revealed.');
+                        pushLog('info', t.log.hintRevealed);
                       }}
                       className="mt-1 flex items-center gap-1.5 text-[11px] sm:text-xs bg-white text-black hover:bg-emerald-500 hover:text-white font-black uppercase tracking-widest py-1 px-2.5 sm:py-1.5 sm:px-3 rounded transition-colors active:scale-95 cursor-pointer"
                     >
                       <Cpu className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                      {isPt ? 'Mostrar dica' : isEs ? 'Mostrar pista' : 'Show hint'}
+                      {t.classic.showHint}
                     </button>
                   )}
 
@@ -987,7 +942,7 @@ export default function App() {
                   {gameStatus !== 'playing' && (
                     <div className="absolute inset-0 bg-surface rounded flex flex-col items-center justify-center px-4 py-2 border border-line animate-in fade-in zoom-in-95 duration-200 z-10">
                       <p className={`text-xs font-black tracking-widest uppercase ${gameStatus === 'won' ? 'text-emerald-500' : 'text-rose-500'}`}>
-                        {gameStatus === 'won' ? (isPt ? 'Vitória! 🎉' : isEs ? '¡Victoria! 🎉' : 'You won! 🎉') : (isPt ? 'Derrota! 💀' : isEs ? '¡Derrota! 💀' : 'You lost 💀')}
+                        {gameStatus === 'won' ? t.classic.won : t.classic.lost}
                       </p>
                       <h3 className="text-xl font-black text-white tracking-[0.2em] font-mono select-text mt-0.5 uppercase">
                         {activeWord.word}
@@ -996,7 +951,7 @@ export default function App() {
                         onClick={() => { triggerSound('click'); generateNewWord(); }}
                         className="mt-2 bg-white text-black hover:bg-emerald-500 hover:text-white font-black text-xs uppercase tracking-widest py-1.5 px-4 rounded transition-colors active:scale-95 cursor-pointer"
                       >
-                        {isPt ? 'Próxima Palavra' : isEs ? 'Siguiente Palabra' : 'Next word'}
+                        {t.classic.nextWord}
                       </button>
                     </div>
                   )}
@@ -1026,12 +981,12 @@ export default function App() {
               <div className="bg-surface p-2 sm:p-3 rounded border border-line flex flex-col items-center justify-center text-xs relative w-full">
                 <div className="flex flex-wrap justify-center gap-x-2 gap-y-1 items-center mb-1">
                   <span className="text-xs font-bold text-emerald-500 uppercase tracking-widest font-mono">
-                    {isPt ? 'Categoria:' : isEs ? 'Categoría:' : 'Category:'} {isPt && enigmaWord.category === 'Nature' ? 'Natureza' : enigmaWord.category}
+                    {t.common.category} {isPt && enigmaWord.category === 'Nature' ? 'Natureza' : enigmaWord.category}
                   </span>
                 </div>
                 <p className="text-[13px] sm:text-sm text-slate-100 font-bold leading-normal px-2">
                   <span className="font-extrabold text-emerald-500 uppercase tracking-widest block text-[11px] mb-0.5">
-                    {isPt ? 'Dica:' : isEs ? 'Pista:' : 'Hint:'}
+                    {t.common.hint}
                   </span>
                   "{enigmaWord.clue}"
                 </p>
@@ -1067,7 +1022,7 @@ export default function App() {
               {/* Score HUD telemetry */}
               <div className="mt-3 sm:mt-4 flex flex-col items-center w-full max-w-xs gap-1">
                 <div className="flex justify-between w-full text-xs uppercase font-bold tracking-wider px-1">
-                  <span className="text-slate-400 font-mono">{isPt ? 'Tempo:' : isEs ? 'Tiempo:' : 'Time:'}</span>
+                  <span className="text-slate-400 font-mono">{t.enigma.time}</span>
                   <span className={`font-mono font-black transition-colors duration-300 ${
                     enigmaTimeLeft < 30 
                       ? 'text-rose-500 animate-pulse text-xs sm:text-sm font-extrabold' 
@@ -1080,9 +1035,9 @@ export default function App() {
                 </div>
 
                 <div className="flex justify-between w-full text-xs uppercase font-bold tracking-wider mb-1 px-1">
-                  <span className="text-slate-400 font-mono">{isPt ? 'Pontos:' : isEs ? 'Puntos:' : 'Score:'}</span>
+                  <span className="text-slate-400 font-mono">{t.enigma.score}</span>
                   <span className={enigmaScore > 40 ? 'text-emerald-400 font-black font-mono' : 'text-rose-500 font-black font-mono'}>
-                    {enigmaScore} pts
+                    {enigmaScore} {t.common.points}
                   </span>
                 </div>
                 {/* Progress bar */}
@@ -1111,7 +1066,7 @@ export default function App() {
                         setEnigmaRevealedLetters(prev => [...prev, randomChar]);
                         setEnigmaScore(prev => Math.max(0, prev - 15));
                         triggerSound('flip');
-                        pushLog('info', isPt ? `Dica acionada: revelando letra [${randomChar}]. -15pts.` : `Letter tip active: revealing letter [${randomChar}]. -15pts.`);
+                        pushLog('info', t.log.enigmaLetterRevealed(randomChar));
                         
                         // Check if all letters are revealed
                         const remaining = enigmaWord.word.split('').filter(c => c !== randomChar && !enigmaRevealedLetters.includes(c));
@@ -1124,7 +1079,7 @@ export default function App() {
                       className="w-full h-9 flex items-center justify-center gap-1.5 bg-surface text-xs text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/10 disabled:opacity-40 rounded py-2 transition-all font-black uppercase cursor-pointer"
                     >
                       <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                      {isPt ? 'Revelar uma letra (−15)' : isEs ? 'Revelar una letra (−15)' : 'Reveal a letter (−15)'}
+                      {t.enigma.revealLetter}
                     </button>
                   ) : (
                     <button
@@ -1132,7 +1087,7 @@ export default function App() {
                       className="w-full h-9 flex items-center justify-center gap-1.5 bg-emerald-500 hover:bg-emerald-400 text-white rounded py-2 font-black uppercase text-xs transition-colors cursor-pointer"
                     >
                       <RefreshCw className="w-4 h-4" />
-                      {isPt ? 'Jogar de novo' : isEs ? 'Jugar de nuevo' : 'Play again'}
+                      {t.enigma.playAgain}
                     </button>
                   )}
 
@@ -1149,7 +1104,7 @@ export default function App() {
             {enigmaStatus === 'playing' ? (
               <div className="w-full max-w-sm px-4 mb-2 flex flex-col gap-1 items-stretch mx-auto select-none">
                 <div className="text-[11px] uppercase tracking-widest text-emerald-500 font-bold text-left mb-0.5 ml-1 font-mono">
-                  {isPt ? 'Seu palpite:' : isEs ? 'Tu respuesta:' : 'Your guess:'}
+                  {t.common.yourGuess}
                 </div>
                 <div className="relative flex items-center bg-surface rounded-lg border border-line focus-within:border-emerald-500 shadow-inner px-2.5 py-1.5 min-h-[36px] sm:min-h-[40px]">
                   <span className="text-emerald-500 font-mono font-black text-xs sm:text-sm mr-2 select-none">{'>'}</span>
@@ -1165,7 +1120,7 @@ export default function App() {
                         submitEnigmaFullGuess();
                       }
                     }}
-                    placeholder={isPt ? "EX: TECNOLOGIA" : "E.G. TECHNOLOGY"}
+                    placeholder={t.enigma.placeholder}
                     className="flex-1 bg-transparent border-none outline-none text-white text-xs sm:text-sm font-black font-mono tracking-wider placeholder-slate-600 uppercase focus:ring-0"
                     maxLength={enigmaWord.word.length}
                   />
@@ -1174,7 +1129,7 @@ export default function App() {
                       onClick={submitEnigmaFullGuess}
                       className="ml-2 px-2.5 py-1 text-xs bg-emerald-500 text-white font-black hover:bg-emerald-400 uppercase tracking-wider rounded transition-colors active:scale-95 cursor-pointer"
                     >
-                      {isPt ? 'Confirmar' : 'Confirm'}
+                      {t.common.confirm}
                     </button>
                   )}
                 </div>
@@ -1188,21 +1143,13 @@ export default function App() {
                 }`}>
                   {enigmaStatus === 'won' ? (
                     <div>
-                      <span className="block text-[11px] uppercase tracking-widest text-emerald-400 font-extrabold mb-1 font-mono">🎉 {isPt ? 'RESOLVIDO!' : isEs ? '¡RESUELTO!' : 'SOLVED!'}</span>
-                      {isPt 
-                        ? `Você acertou com ${enigmaScore} pontos!` 
-                        : isEs
-                          ? `¡Acertaste con ${enigmaScore} puntos!`
-                          : `You solved it with ${enigmaScore} points!`}
+                      <span className="block text-[11px] uppercase tracking-widest text-emerald-400 font-extrabold mb-1 font-mono">🎉 {t.enigma.solvedTitle}</span>
+                      {t.enigma.solvedText(enigmaScore)}
                     </div>
                   ) : (
                     <div>
-                      <span className="block text-[11px] uppercase tracking-widest text-rose-400 font-extrabold mb-1 font-mono">💥 {isPt ? 'FIM DE JOGO' : isEs ? 'FIN DEL JUEGO' : 'GAME OVER'}</span>
-                      {isPt 
-                        ? `A palavra era ${enigmaWord.word}` 
-                        : isEs
-                          ? `La palabra era ${enigmaWord.word}`
-                          : `The word was ${enigmaWord.word}`}
+                      <span className="block text-[11px] uppercase tracking-widest text-rose-400 font-extrabold mb-1 font-mono">💥 {t.enigma.lostTitle}</span>
+                      {t.enigma.lostText(enigmaWord.word)}
                     </div>
                   )}
                 </div>
@@ -1219,7 +1166,7 @@ export default function App() {
               <div className="bg-surface p-2 sm:p-3 rounded border border-rose-500/20 flex flex-col items-center justify-center text-xs relative w-full">
                 <div className="flex flex-wrap justify-center gap-x-2 gap-y-1 items-center mb-1">
                   <span className="text-xs font-bold text-rose-400 uppercase tracking-widest font-mono">
-                    {isPt ? 'Categoria:' : isEs ? 'Categoría:' : 'Category:'} {isPt && survivalWord.category === 'Nature' ? 'Natureza' : survivalWord.category}
+                    {t.common.category} {isPt && survivalWord.category === 'Nature' ? 'Natureza' : survivalWord.category}
                   </span>
                   <motion.span
                     key={survivalStreak}
@@ -1238,7 +1185,7 @@ export default function App() {
                     className="text-[11px] font-bold px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 uppercase tracking-wider font-mono flex items-center gap-1 relative overflow-visible"
                   >
                     <Trophy className={`w-3 h-3 transition-colors duration-300 ${survivalStreak >= 3 ? 'text-amber-400' : 'text-rose-400'}`} />
-                    <span>{isPt ? `${survivalStreak} Acertos` : `${survivalStreak} Solved`}</span>
+                    <span>{t.survival.solvedCount(survivalStreak)}</span>
 
                     {/* Subtle Fire 'On Fire' Indicator if streak >= 3 */}
                     {survivalStreak >= 3 && (
@@ -1302,7 +1249,7 @@ export default function App() {
                 </div>
                 <p className="text-[13px] sm:text-sm text-slate-100 font-bold leading-normal px-2">
                   <span className="font-extrabold text-rose-400 uppercase tracking-widest block text-[11px] mb-0.5">
-                    {isPt ? 'Dica:' : isEs ? 'Pista:' : 'Hint:'}
+                    {t.common.hint}
                   </span>
                   "{survivalWord.clue}"
                 </p>
@@ -1357,7 +1304,7 @@ export default function App() {
                 {isSurvivalTransitioning && (
                   <div className="w-full mt-1 mb-2">
                     <div className="flex justify-between items-center text-[11px] font-mono font-extrabold text-rose-500 mb-1 tracking-widest uppercase">
-                      <span>{isPt ? 'PRÓXIMA PALAVRA EM...' : 'NEXT WORD IN...'}</span>
+                      <span>{t.survival.nextWordIn}</span>
                       <motion.span
                         animate={{ rotate: 360 }}
                         transition={{ repeat: Infinity, duration: 2.5, ease: "linear" }}
@@ -1389,7 +1336,7 @@ export default function App() {
             {survivalStatus === 'playing' ? (
               <div className="w-full max-w-sm px-4 mb-2 flex flex-col gap-1 items-stretch mx-auto select-none">
                 <div className="text-[11px] uppercase tracking-widest text-rose-500 font-bold text-left mb-0.5 ml-1 font-mono">
-                  {isPt ? 'Seu palpite:' : isEs ? 'Tu respuesta:' : 'Your guess:'}
+                  {t.common.yourGuess}
                 </div>
                 <div className="relative flex items-center bg-surface rounded-lg border border-line focus-within:border-rose-500 shadow-inner px-2.5 py-1.5 min-h-[36px] sm:min-h-[40px]">
                   <span className="text-rose-500 font-mono font-black text-xs sm:text-sm mr-2 select-none">{'>'}</span>
@@ -1405,7 +1352,7 @@ export default function App() {
                         submitSurvivalFullGuess();
                       }
                     }}
-                    placeholder={isPt ? "EX: COMPUTADOR" : "E.G. KEYBOARD"}
+                    placeholder={t.survival.placeholder}
                     className="flex-1 bg-transparent border-none outline-none text-white text-xs sm:text-sm font-black font-mono tracking-wider placeholder-slate-600 uppercase focus:ring-0"
                     maxLength={survivalWord.word.length}
                   />
@@ -1414,7 +1361,7 @@ export default function App() {
                       onClick={submitSurvivalFullGuess}
                       className="ml-2 px-2.5 py-1 text-xs bg-rose-500 text-white font-black hover:bg-rose-400 uppercase tracking-wider rounded transition-colors active:scale-95 cursor-pointer"
                     >
-                      {isPt ? 'Confirmar' : 'Confirm'}
+                      {t.common.confirm}
                     </button>
                   )}
                 </div>
@@ -1428,24 +1375,18 @@ export default function App() {
                 }`}>
                   {survivalStatus === 'won' ? (
                     <div>
-                      <span className="block text-[11px] uppercase tracking-widest text-emerald-450 font-extrabold mb-1 font-mono">🎉 {isPt ? 'ACERTO CONCLUÍDO!' : 'CORRECT ANSWER!'}</span>
-                      {isPt 
-                        ? `Carregando a próxima palavra...` 
-                        : isEs
-                          ? `Cargando la siguiente palabra...`
-                          : `Loading the next word...`}
+                      <span className="block text-[11px] uppercase tracking-widest text-emerald-450 font-extrabold mb-1 font-mono">🎉 {t.survival.correctTitle}</span>
+                      {t.survival.loadingNext}
                     </div>
                   ) : (
                     <div>
-                      <span className="block text-[11px] uppercase tracking-widest text-rose-450 font-extrabold mb-1 font-mono">☠️ {isPt ? 'FIM DE JOGO!' : 'GAME OVER!'}</span>
-                      {isPt 
-                        ? `Você acertou ${survivalStreak} palavras seguidas! A última palavra era: ${survivalWord.word}` 
-                        : `You solved ${survivalStreak} words in a row! The final word was: ${survivalWord.word}`}
+                      <span className="block text-[11px] uppercase tracking-widest text-rose-450 font-extrabold mb-1 font-mono">☠️ {t.survival.lostTitle}</span>
+                      {t.survival.lostText(survivalStreak, survivalWord.word)}
                       <button
                         onClick={startSurvivalGame}
                         className="mt-2.5 w-full py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded font-black uppercase text-[11px] sm:text-xs transition-colors cursor-pointer block text-center"
                       >
-                        {isPt ? 'Tentar Novamente' : 'Try Again'}
+                        {t.survival.tryAgain}
                       </button>
                     </div>
                   )}

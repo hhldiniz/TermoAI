@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Terminal, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 import { LLMLog } from '../types';
+import { getMessages } from '../i18n';
 
 interface LLMConsoleProps {
   language: 'pt' | 'en' | 'es';
@@ -26,11 +27,10 @@ export default function LLMConsole({
     }
   }, [logs, isOpen]);
 
-  const isPt = language === 'pt';
-  const isEs = language === 'es';
-  const labelTitle = isPt ? 'Console do motor' : isEs ? 'Consola del motor' : 'Engine console';
-  const labelEmpty = isPt ? 'Nenhuma mensagem ainda.' : isEs ? 'Aún no hay mensajes.' : 'No messages yet.';
-  const labelClear = isPt ? 'Limpar' : isEs ? 'Borrar' : 'Clear';
+  const t = getMessages(language);
+  const labelTitle = t.console.title;
+  const labelEmpty = t.console.empty;
+  const labelClear = t.console.clear;
   const lastLog = logs[logs.length - 1];
 
   return (

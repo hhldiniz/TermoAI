@@ -2,6 +2,7 @@ import React from 'react';
 import { Settings, Volume2, VolumeX, X } from 'lucide-react';
 import { GameSettings, WordLength } from '../types';
 import { getCategories } from '../categories';
+import { getMessages } from '../i18n';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -22,24 +23,19 @@ export default function SettingsModal({
 }: SettingsModalProps) {
   if (!isOpen) return null;
 
-  const isPt = language === 'pt';
-  const isEs = language === 'es';
-  const labelTitle = isPt ? 'Configurações' : isEs ? 'Configuración' : 'Settings';
-  const labelLang = isPt ? 'Idioma do Jogo' : isEs ? 'Idioma del Juego' : 'Game Language';
-  const labelSound = isPt ? 'Efeitos Sonoros' : isEs ? 'Efectos de Sonido' : 'Sound Effects';
-  const labelHardMode = isPt ? 'Modo Difícil' : isEs ? 'Modo Difícil' : 'Hard Mode';
-  const labelWordLength = isPt ? 'Letras (Clássico)' : isEs ? 'Letras (Clásico)' : 'Letters (Classic)';
-  const labelCategory = isPt ? 'Categoria (Clássico)' : isEs ? 'Categoría (Clásico)' : 'Category (Classic)';
-  const labelClassicNote = isPt ? 'Vale a partir da próxima palavra.' : isEs ? 'Se aplica desde la próxima palabra.' : 'Applies from the next word.';
-  const labelConsole = isPt ? 'Console do motor' : isEs ? 'Consola del motor' : 'Engine console';
-  const labelConsoleDesc = isPt ? 'Mostra um painel com as mensagens internas do jogo.' : isEs ? 'Muestra un panel con los mensajes internos del juego.' : 'Shows a panel with the game\'s internal messages.';
-  const labelAutoClue = isPt ? 'Dica Automática' : isEs ? 'Pista Automática' : 'Auto Reveal Hint';
-  const labelAutoClueDesc = isPt 
-    ? 'Revela a pista da palavra após a 3ª tentativa.' 
-    : isEs 
-      ? 'Revela la pista de la palabra automáticamente tras el 3er intento.' 
-      : 'Reveals the word clue automatically after the 3rd guess.';
-  
+  const t = getMessages(language);
+  const labelTitle = t.settings.title;
+  const labelLang = t.settings.language;
+  const labelSound = t.settings.sound;
+  const labelHardMode = t.settings.hardMode;
+  const labelWordLength = t.settings.wordLength;
+  const labelCategory = t.settings.category;
+  const labelClassicNote = t.settings.classicNote;
+  const labelConsole = t.settings.console;
+  const labelConsoleDesc = t.settings.consoleDesc;
+  const labelAutoClue = t.settings.autoHint;
+  const labelAutoClueDesc = t.settings.autoHintDesc;
+
   const toggleSound = () => {
     const nextVal = !settings.soundEnabled;
     setSettings(prev => ({ ...prev, soundEnabled: nextVal }));
@@ -84,7 +80,7 @@ export default function SettingsModal({
             <div className="flex flex-col gap-0.5 max-w-[70%]">
               <span className="text-xs font-black text-white uppercase tracking-wider">{labelLang}</span>
               <span className="text-xs text-muted">
-                {isPt ? 'Muda as palavras e os textos do jogo.' : isEs ? 'Cambia las palabras y los textos del juego.' : 'Changes the words and the game text.'}
+                {t.settings.languageDesc}
               </span>
             </div>
             <div className="flex gap-1.5 bg-app p-1 rounded border border-line font-bold text-xs">
@@ -168,7 +164,7 @@ export default function SettingsModal({
             <div className="flex flex-col gap-0.5">
               <span className="text-xs font-black text-white uppercase tracking-wider">{labelSound}</span>
               <span className="text-xs text-muted">
-                {isPt ? 'Toca sons durante o jogo.' : isEs ? 'Reproduce sonidos durante el juego.' : 'Plays sounds during the game.'}
+                {t.settings.soundDesc}
               </span>
             </div>
             <button
@@ -207,11 +203,7 @@ export default function SettingsModal({
             <div className="flex flex-col gap-0.5 max-w-[75%]">
               <span className="text-xs font-black text-white uppercase tracking-wider">{labelHardMode}</span>
               <span className="text-xs text-muted leading-normal">
-                {isPt 
-                  ? 'Letras reveladas (verdes e amarelas) devem ser usadas nos próximos palpites.' 
-                  : isEs 
-                    ? 'Las letras reveladas (verdes y amarillas) deben usarse en los siguientes intentos.' 
-                    : 'Revealed letters (green and yellow) must be used in later guesses.'}
+                {t.settings.hardModeDesc}
               </span>
             </div>
             <button
