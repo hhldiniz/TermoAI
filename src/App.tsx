@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react';
 import { GameMode, GameSettings, GameStats, SoundType } from './types';
-import { loadDictionary } from './dictionary';
 import { getMessages, getHtmlLang } from './i18n';
 import { playSound } from './utils/audio';
 import { GameContext, GameContextValue } from './GameContext';
@@ -14,8 +13,10 @@ import SettingsModal from './components/SettingsModal';
 import HelpModal from './components/HelpModal';
 import ConfirmDialog from './components/ConfirmDialog';
 import ClassicGame from './modes/ClassicGame';
-import EnigmaGame from './modes/EnigmaGame';
-import SurvivalGame from './modes/SurvivalGame';
+
+// Loaded on demand so the menu and Classic don't pay for the other modes
+const EnigmaGame = lazy(() => import('./modes/EnigmaGame'));
+const SurvivalGame = lazy(() => import('./modes/SurvivalGame'));
 
 const DEFAULT_SETTINGS: GameSettings = {
   language: 'pt',
@@ -70,11 +71,6 @@ export default function App() {
   useEffect(() => {
     document.documentElement.dataset.contrast = settings.highContrast ? 'high' : 'normal';
   }, [settings.highContrast]);
-
-  // Preload the guess dictionary for the active language
-  useEffect(() => {
-    loadDictionary(settings.language).catch((e) => console.error('Failed to load dictionary', e));
-  }, [settings.language]);
 
   const triggerSound = useCallback((type: SoundType) => {
     playSound(type, settings.soundEnabled);
@@ -231,13 +227,15 @@ export default function App() {
             />
           )}
 
-          {gameMode === 'enigma' && (
-            <EnigmaGame restartToken={restartToken} onResult={handleEnigmaResult} onStateChange={handleModeState} />
-          )}
+          <Suspense fallback={<div className="flex-1" aria-busy="true" />}>
+            {gameMode === 'enigma' && (
+              <EnigmaGame restartToken={restartToken} onResult={handleEnigmaResult} onStateChange={handleModeState} />
+            )}
 
-          {gameMode === 'survival' && (
-            <SurvivalGame restartToken={restartToken} onRunEnd={handleSurvivalEnd} onStateChange={handleModeState} />
-          )}
+            {gameMode === 'survival' && (
+              <SurvivalGame restartToken={restartToken} onRunEnd={handleSurvivalEnd} onStateChange={handleModeState} />
+            )}
+          </Suspense>
 
           <StatsModal
             isOpen={isStatsOpen}
