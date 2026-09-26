@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AlertCircle, BarChart3, Cpu, Share2 } from 'lucide-react';
 import { GameStatus, GuessAttempt, WordData } from '../types';
 import { generateWordOffline, normalizeText } from '../words';
-import { isKnownWord } from '../dictionary';
+import { isKnownWord, loadDictionary } from '../dictionary';
 import { useGame } from '../GameContext';
 import { usePhysicalKeyboard } from '../hooks/usePhysicalKeyboard';
 import { buildShareGrid, checkHardMode, evaluateGuess, getKeyStatuses, sanitizeLetter } from '../game/classic';
@@ -68,6 +68,11 @@ export default function ClassicGame({ restartToken, onResult, onShowStats, onSta
     setErrorMessage(null);
     setActiveWord(solvedWord);
   }, [settings.language, settings.category, settings.wordLength, t]);
+
+  // Load the guess dictionary for the active language
+  useEffect(() => {
+    loadDictionary(settings.language).catch((e) => console.error('Failed to load dictionary', e));
+  }, [settings.language]);
 
   // Pick a word on start (unless a saved game was restored), and again when word
   // settings change if no guess was made yet

@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Heart, Sparkles, Trophy } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
 import { GameStatus } from '../types';
 import { getRandomLargeWord, LargeWordData, normalizeText } from '../words';
 import { useGame } from '../GameContext';
@@ -12,6 +11,25 @@ import Keyboard from '../components/Keyboard';
 const START_LIVES = 3;
 const TRIES_PER_WORD = 3;
 const TRANSITION_MS = 2500;
+
+type BurstParticle = {
+  icon: 'sparkle' | 'fire';
+  className: string;
+  iconClass?: string;
+  style: React.CSSProperties;
+};
+
+/** Particles that fly out of the streak badge on each solved word (see .animate-burst) */
+const BURST_PARTICLES: BurstParticle[] = [
+  { icon: 'sparkle', className: 'text-orange-400', iconClass: 'w-3.5 h-3.5 fill-orange-400 text-orange-400',
+    style: { '--dx': '-22px', '--dy': '-18px', '--rot': '45deg' } as React.CSSProperties },
+  { icon: 'sparkle', className: 'text-yellow-400', iconClass: 'w-3 h-3 fill-yellow-400 text-yellow-400',
+    style: { '--dx': '22px', '--dy': '-18px', '--rot': '-45deg', '--burst-delay': '0.08s' } as React.CSSProperties },
+  { icon: 'fire', className: 'text-red-500 text-xs select-none',
+    style: { '--dx': '-4px', '--dy': '-26px', '--y0': '5px', '--s0': '0.2', '--s1': '1.5', '--burst-duration': '0.9s', '--burst-delay': '0.04s' } as React.CSSProperties },
+  { icon: 'fire', className: 'text-orange-500 text-xs select-none',
+    style: { '--dx': '6px', '--dy': '-26px', '--y0': '5px', '--s0': '0.2', '--s1': '1.5', '--burst-duration': '0.9s', '--burst-delay': '0.12s' } as React.CSSProperties },
+];
 
 interface SurvivalGameProps {
   /** Incremented by the parent to start a new run */
@@ -146,73 +164,28 @@ export default function SurvivalGame({ restartToken, onRunEnd, onStateChange }: 
   }));
 
   const streakBadge = (
-    <motion.span
+    <span
       key={streak}
-      initial={{ scale: 1 }}
-      animate={streak > 0 ? {
-        scale: [1, 1.25, 1],
-        borderColor: ['rgba(244,63,94,0.2)', 'rgba(249,115,22,0.8)', 'rgba(244,63,94,0.2)'],
-        backgroundColor: ['rgba(244,63,94,0.1)', 'rgba(249,115,22,0.25)', 'rgba(244,63,94,0.1)'],
-        boxShadow: ['0 0 0px rgba(0,0,0,0)', '0 0 12px rgba(249,115,22,0.6)', '0 0 0px rgba(0,0,0,0)']
-      } : {}}
-      transition={{ duration: 0.6, ease: 'easeOut' }}
-      className="text-[11px] font-bold px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 uppercase tracking-wider font-mono flex items-center gap-1 relative overflow-visible"
+      className={`text-[11px] font-bold px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 uppercase tracking-wider font-mono flex items-center gap-1 relative overflow-visible ${streak > 0 ? 'animate-streak-pop' : ''}`}
     >
       <Trophy className={`w-3 h-3 transition-colors duration-300 ${streak >= 3 ? 'text-amber-400' : 'text-rose-400'}`} />
       <span>{t.survival.solvedCount(streak)}</span>
       {streak >= 3 && (
-        <motion.span
-          animate={{ scale: [1, 1.2, 1], y: [0, -1, 0] }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
-          className="text-xs select-none text-orange-500 ml-0.5"
-        >
+        <span className="text-xs select-none text-orange-500 ml-0.5 inline-block animate-fire-pulse">
           🔥
-        </motion.span>
+        </span>
       )}
       {/* Burst on each correct answer */}
-      <AnimatePresence>
-        {status === 'won' && (
-          <span className="absolute inset-0 pointer-events-none flex items-center justify-center">
-            <motion.span
-              initial={{ x: 0, y: 0, scale: 0, opacity: 1 }}
-              animate={{ x: -22, y: -18, scale: 1.3, opacity: 0, rotate: 45 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.8, ease: 'easeOut' }}
-              className="absolute text-orange-400"
-            >
-              <Sparkles className="w-3.5 h-3.5 fill-orange-400 text-orange-400" />
-            </motion.span>
-            <motion.span
-              initial={{ x: 0, y: 0, scale: 0, opacity: 1 }}
-              animate={{ x: 22, y: -18, scale: 1.3, opacity: 0, rotate: -45 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.8, ease: 'easeOut', delay: 0.08 }}
-              className="absolute text-yellow-400"
-            >
-              <Sparkles className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-            </motion.span>
-            <motion.span
-              initial={{ x: 0, y: 5, scale: 0.2, opacity: 1 }}
-              animate={{ x: -4, y: -26, scale: 1.5, opacity: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.9, ease: 'easeOut', delay: 0.04 }}
-              className="absolute text-red-500 text-xs select-none"
-            >
-              🔥
-            </motion.span>
-            <motion.span
-              initial={{ x: 0, y: 5, scale: 0.2, opacity: 1 }}
-              animate={{ x: 6, y: -26, scale: 1.5, opacity: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.9, ease: 'easeOut', delay: 0.12 }}
-              className="absolute text-orange-500 text-xs select-none"
-            >
-              🔥
-            </motion.span>
-          </span>
-        )}
-      </AnimatePresence>
-    </motion.span>
+      {status === 'won' && (
+        <span className="absolute inset-0 pointer-events-none flex items-center justify-center">
+          {BURST_PARTICLES.map((p, i) => (
+            <span key={i} className={`absolute animate-burst ${p.className}`} style={p.style}>
+              {p.icon === 'sparkle' ? <Sparkles className={p.iconClass} /> : '🔥'}
+            </span>
+          ))}
+        </span>
+      )}
+    </span>
   );
 
   return (
@@ -244,20 +217,12 @@ export default function SurvivalGame({ restartToken, onRunEnd, onStateChange }: 
             <div className="w-full mt-1 mb-2">
               <div className="flex justify-between items-center text-[11px] font-mono font-extrabold text-rose-500 mb-1 tracking-widest uppercase">
                 <span>{t.survival.nextWordIn}</span>
-                <motion.span
-                  animate={{ rotate: 360 }}
-                  transition={{ repeat: Infinity, duration: 2.5, ease: 'linear' }}
-                  className="inline-block text-sm"
-                >
-                  ⏳
-                </motion.span>
+                <span className="inline-block text-sm animate-spin-slow">⏳</span>
               </div>
               <div className="w-full h-2.5 bg-surface border border-line rounded-full overflow-hidden relative">
-                <motion.div
-                  initial={{ width: '100%' }}
-                  animate={{ width: '0%' }}
-                  transition={{ duration: TRANSITION_MS / 1000, ease: 'linear' }}
-                  className="h-full bg-gradient-to-r from-rose-500 via-orange-500 to-yellow-400 rounded-full"
+                <div
+                  style={{ '--countdown-ms': `${TRANSITION_MS}ms` } as React.CSSProperties}
+                  className="animate-countdown h-full bg-gradient-to-r from-rose-500 via-orange-500 to-yellow-400 rounded-full"
                 />
               </div>
             </div>
